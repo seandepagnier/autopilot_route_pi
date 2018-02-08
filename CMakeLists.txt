@@ -30,6 +30,7 @@ SET(SRC_AUTOPILOT_ROUTE
             src/autopilot_route_pi.cpp
             src/PreferencesDialog.cpp
             src/AutopilotRouteUI.cpp
+            src/concanv.cpp
             src/computation.cpp
             src/georef.c
             src/icons.cpp

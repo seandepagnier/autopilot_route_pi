@@ -25,20 +25,5 @@ SET(SRC_NMEA0183
     src/nmea0183/vtg.cpp
     src/nmea0183/gga.cpp
     src/nmea0183/gsv.cpp
-    src/nmea0183/dbt.cpp
-    src/nmea0183/dpt.cpp
-    src/nmea0183/mtw.cpp
-    src/nmea0183/mwv.cpp
-    src/nmea0183/vhw.cpp
-    src/nmea0183/vwr.cpp
-    src/nmea0183/zda.cpp
-    src/nmea0183/rsa.cpp
-    src/nmea0183/mwd.cpp
-    src/nmea0183/vwt.cpp
-    src/nmea0183/mta.cpp
-    src/nmea0183/vlw.cpp
-    src/nmea0183/mda.cpp
-    src/nmea0183/xdr.cpp
 )
-
 INCLUDE_DIRECTORIES(src/nmea0183)
