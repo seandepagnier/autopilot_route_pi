@@ -20,14 +20,15 @@
  *   You should have received a copy of the GNU General Public License     *
  *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.             *
+ *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
- *
+ *                                                                         *
  *   S Blackburn's original source license:                                *
  *         "You can use it any way you like."                              *
  *   More recent (2010) license statement:                                 *
  *         "It is BSD license, do with it what you will"                   *
  */
+
 
 #include "nmea0183.h"
 
@@ -39,48 +40,52 @@
 ** You can use it any way you like.
 */
 
-//IMPLEMENT_DYNAMIC( MWV, RESPONSE )
+extern int              g_NMEAXTEPrecision;
 
-MWV::MWV()
+
+XTE::XTE()
 {
-   Mnemonic = _T("MWV");
+   Mnemonic = _T("XTE");
    Empty();
 }
 
-MWV::~MWV()
+XTE::~XTE()
 {
    Mnemonic.Empty();
    Empty();
 }
 
-void MWV::Empty( void )
+void XTE::Empty( void )
 {
 //   ASSERT_VALID( this );
 
-   WindAngle   = 0.0;
-   Reference.Empty();
-   WindSpeed   = 0.0;
-   WindSpeedUnits.Empty();
-   IsDataValid = Unknown0183;
+   CrossTrackErrorDistance = 0.0;
+   DirectionToSteer         = LR_Unknown;
 }
 
-bool MWV::Parse( const SENTENCE& sentence )
+bool XTE::Parse( const SENTENCE& sentence )
 {
 //   ASSERT_VALID( this );
 
+   wxString field_data;
+
    /*
-   ** MWV - Wind Speed and Angle
+   ** XTE - Autopilot Sentence
+   **                      
+   **        1 2 3   4 5 6 
+   **        | | |   | | | 
+   ** $--XTE,A,A,x.x,a,N*hh<CR><LF>
    **
-   **        1   2 3   4 5
-   **        |   | |   | |
-   ** $--MWV,x.x,a,x.x,a*hh<CR><LF>
-   **
-   ** Field Number: 
-   **  1) Wind Angle, 0 to 360 degrees
-   **  2) Reference, R = Relative, T = True
-   **  3) Wind Speed
-   **  4) Wind Speed Units, K/M/N
-   **  5) Status, A = Data Valid
+   **  1) Status
+   **     V = LORAN-C Blink or SNR warning
+   **     V = general warning flag or other navigation systems when a reliable
+   **         fix is not available
+   **  2) Status
+   **     V = Loran-C Cycle Lock warning flag
+   **     A = OK or not used
+   **  3) Cross Track Error Magnitude
+   **  4) Direction to steer, L or R
+   **  5) Cross Track Units, N = Nautical Miles
    **  6) Checksum
    */
 
@@ -88,22 +93,28 @@ bool MWV::Parse( const SENTENCE& sentence )
    ** First we check the checksum...
    */
 
-   if ( sentence.IsChecksumBad( 6 ) == TRUE )
+   NMEA0183_BOOLEAN check = sentence.IsChecksumBad( 15 );
+   
+   if ( check == NTrue )
    {
       SetErrorMessage( _T("Invalid Checksum") );
       return( FALSE );
    } 
 
-   WindAngle      = sentence.Double( 1 );
-   Reference      = sentence.Field( 2 );
-   WindSpeed      = sentence.Double( 3 );
-   WindSpeedUnits = sentence.Field( 4 );
-   IsDataValid    = sentence.Boolean( 5 );
+   /*
+   ** Line has already been checked for checksum validity
+   */
+
+   IsLoranBlinkOK                           = sentence.Boolean( 1 );
+   IsLoranCCycleLockOK                      = sentence.Boolean( 2 );
+   CrossTrackErrorDistance                  = sentence.Double( 3 );
+   DirectionToSteer                         = sentence.LeftOrRight( 4 );
+   CrossTrackUnits                          = sentence.Field( 5 );
 
    return( TRUE );
 }
 
-bool MWV::Write( SENTENCE& sentence )
+bool XTE::Write( SENTENCE& sentence )
 {
 //   ASSERT_VALID( this );
 
@@ -113,26 +124,31 @@ bool MWV::Write( SENTENCE& sentence )
    
    RESPONSE::Write( sentence );
 
-   sentence += WindAngle;
-   sentence += Reference;
-   sentence += WindSpeed;
-   sentence += WindSpeedUnits;
-   sentence += IsDataValid;
+   sentence += IsLoranBlinkOK;
+   sentence += IsLoranCCycleLockOK;
+   sentence += CrossTrackErrorDistance;
+
+   if(DirectionToSteer == Left)
+       sentence += _T("L");
+   else
+       sentence += _T("R");
+   
+   sentence += CrossTrackUnits;
 
    sentence.Finish();
 
    return( TRUE );
 }
 
-const MWV& MWV::operator = ( const MWV& source )
+const XTE& XTE::operator = ( const XTE& source )
 {
 //   ASSERT_VALID( this );
- 
-   WindAngle      = source.WindAngle;
-   Reference      = source.Reference;
-   WindSpeed      = source.WindSpeed;
-   WindSpeedUnits = source.WindSpeedUnits;
-   IsDataValid    = source.IsDataValid;
+
+   IsLoranBlinkOK                           = source.IsLoranBlinkOK;
+   IsLoranCCycleLockOK                      = source.IsLoranCCycleLockOK;
+   CrossTrackErrorDistance                  = source.CrossTrackErrorDistance;
+   DirectionToSteer                         = source.DirectionToSteer;
+   CrossTrackUnits                          = source.CrossTrackUnits;
 
    return( *this );
 }

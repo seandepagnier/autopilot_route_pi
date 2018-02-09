@@ -29,6 +29,7 @@
  *         "It is BSD license, do with it what you will"                   *
  */
 
+
 #include "nmea0183.h"
 
 /*
@@ -39,103 +40,89 @@
 ** You can use it any way you like.
 */
 
-//IMPLEMENT_DYNAMIC( VHW, RESPONSE )
+//IMPLEMENT_DYNAMIC( GPWPL, RESPONSE )
 
-VHW::VHW()
+GPWPL::GPWPL()
 {
-   Mnemonic = _T("VHW");
+   Mnemonic = _T("GPwpl");
    Empty();
 }
 
-VHW::~VHW()
+GPWPL::~GPWPL()
 {
    Mnemonic.Empty();
    Empty();
 }
 
-void VHW::Empty( void )
+void GPWPL::Empty( void )
 {
-//   ASSERT_VALID( this );
 
-   DegreesTrue       = 0.0;
-   DegreesMagnetic   = 0.0;
-   Knots             = 0.0;
-   KilometersPerHour = 0.0;
+   Position.Empty();
+   To.Empty();
 }
 
-bool VHW::Parse( const SENTENCE& sentence )
+bool GPWPL::Parse( const SENTENCE& sentence )
 {
-//   ASSERT_VALID( this );
 
    /*
-   ** VHW - Water speed and heading
+   ** WPL - Waypoint Location
    **
-   **        1   2 3   4 5   6 7   8 9
-   **        |   | |   | |   | |   | |
-   ** $--VHW,x.x,T,x.x,M,x.x,N,x.x,K*hh<CR><LF>
-   **
-   ** Field Number: 
-   **  1) Degress True
-   **  2) T = True
-   **  3) Degrees Magnetic
-   **  4) M = Magnetic
-   **  5) Knots (speed of vessel relative to the water)
-   **  6) N = Knots
-   **  7) Kilometers (speed of vessel relative to the water)
-   **  8) K = Kilometers
-   **  9) Checksum
+   **        +-------------------------------- 1) Latitude
+   **        |       +------------------------ 2) N or S (North or South)
+   **        |       | +---------------------- 3) Longitude
+   **        |       | |        +------------- 4) E or W (East or West)
+   **        |       | |        | +----------- 5) Waypoint name
+   **        |       | |        | |    +-------6) Checksum
+   **        |       | |        | |    |
+   ** $--WPL,llll.ll,a,yyyyy.yy,a,c--c*hh<CR><LF>
    */
 
    /*
    ** First we check the checksum...
    */
 
-   if ( sentence.IsChecksumBad( 9 ) == TRUE )
+   if ( sentence.IsChecksumBad( 6 ) == NTrue )
    {
       SetErrorMessage( _T("Invalid Checksum") );
       return( FALSE );
-   } 
+   }
 
-   DegreesTrue       = sentence.Double( 1 );
-   DegreesMagnetic   = sentence.Double( 3 );
-   Knots             = sentence.Double( 5 );
-   KilometersPerHour = sentence.Double( 7 );
+   Position.Parse( 1, 2, 3, 4, sentence );
+   To = sentence.Field( 5 );
 
    return( TRUE );
 }
 
-bool VHW::Write( SENTENCE& sentence )
+bool GPWPL::Write( SENTENCE& sentence )
 {
-//   ASSERT_VALID( this );
-
    /*
    ** Let the parent do its thing
    */
-   
+
    RESPONSE::Write( sentence );
 
-   sentence += DegreesTrue;
-   sentence += _T("T");
-   sentence += DegreesMagnetic;
-   sentence += _T("M");
-   sentence += Knots;
-   sentence += _T("N");
-   sentence += KilometersPerHour;
-   sentence += _T("K");
+   sentence += Position;
+   sentence += To;
+   sentence += _T("");            // color = black
+   sentence += _T("@q");             // comment, minimum
+   sentence += _T("A");
+   sentence += _T("");
+   sentence += _T("");
+   sentence += _T("");
 
-   sentence.Finish();
+   // No checksum required
+   wxString temp_string;
+   temp_string.Printf(_T("%c%c"), CARRIAGE_RETURN, LINE_FEED );
+   sentence += temp_string;
 
    return( TRUE );
 }
 
-const VHW& VHW::operator = ( const VHW& source )
+const GPWPL& GPWPL::operator = ( const GPWPL& source )
 {
-//   ASSERT_VALID( this );
 
-   DegreesTrue       = source.DegreesTrue;
-   DegreesMagnetic   = source.DegreesMagnetic;
-   Knots             = source.Knots;
-   KilometersPerHour = source.KilometersPerHour;
+   Position = source.Position;
+   To       = source.To;
 
    return( *this );
 }
