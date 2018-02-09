@@ -51,9 +51,7 @@ bool             g_bShowRouteTotal;
 #endif
 
 enum eMenuItems {
-    ID_NAVLEG,
-    ID_NAVROUTE,
-    ID_NAVHIGHWAY,
+    ID_DEACTIVATE,
     ID_PREFERENCES
 } menuItems;
 
@@ -64,9 +62,7 @@ BEGIN_EVENT_TABLE(ConsoleCanvas, wxWindow)
     EVT_PAINT(ConsoleCanvas::OnPaint)
     EVT_SHOW(ConsoleCanvas::OnShow)
     EVT_CONTEXT_MENU(ConsoleCanvas::OnContextMenu)
-    EVT_MENU(ID_NAVLEG, ConsoleCanvas::OnContextMenuSelection)
-    EVT_MENU(ID_NAVROUTE, ConsoleCanvas::OnContextMenuSelection)
-    EVT_MENU(ID_NAVHIGHWAY, ConsoleCanvas::OnContextMenuSelection)
+    EVT_MENU(ID_DEACTIVATE, ConsoleCanvas::OnContextMenuSelection)
     EVT_MENU(ID_PREFERENCES, ConsoleCanvas::OnContextMenuSelection)
     
 END_EVENT_TABLE()
@@ -78,7 +74,7 @@ ConsoleCanvas::ConsoleCanvas( wxWindow *frame, autopilot_route_pi &pi )
     pbackBrush = NULL;
     m_bNeedClear = false;
 
-long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
+    long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
 #ifdef __WXOSX__
     style |= wxSTAY_ON_TOP;
 #endif
@@ -89,14 +85,6 @@ long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
 
     m_pitemBoxSizerLeg = new wxBoxSizer( wxVERTICAL );
 
-    pThisLegText = new wxStaticText( this, -1, _("This Leg") );
-    pThisLegText->Fit();
-    m_pitemBoxSizerLeg->Add( pThisLegText, 0, wxALIGN_CENTER_HORIZONTAL, 2 );
-
-
-    wxFont pThisLegFont = wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL );
-    pThisLegText->SetFont( pThisLegFont );
-
     pXTE = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
     pXTE->SetALabel( _T("XTE") );
     m_pitemBoxSizerLeg->Add( pXTE, 1, wxALIGN_LEFT | wxALL, 2 );
@@ -105,20 +93,23 @@ long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
     pBRG->SetALabel( _T("BRG") );
     m_pitemBoxSizerLeg->Add( pBRG, 1, wxALIGN_LEFT | wxALL, 2 );
 
+    pRNG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
+    pRNG->SetALabel( _T("RNG") );
+    m_pitemBoxSizerLeg->Add( pRNG, 1, wxALIGN_LEFT | wxALL, 2 );
+
     pVMG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
     pVMG->SetALabel( _T("VMG") );
     m_pitemBoxSizerLeg->Add( pVMG, 1, wxALIGN_LEFT | wxALL, 2 );
 
-    pRNG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
-    pRNG->SetALabel( _T("RNG") );
-    m_pitemBoxSizerLeg->Add( pRNG, 1, wxALIGN_LEFT | wxALL, 2 );
+    pETA = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
+    pETA->SetALabel( _T("ETA") );
+    m_pitemBoxSizerLeg->Add( pETA, 1, wxALIGN_LEFT | wxALL, 2 );
 
     pTTG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
     pTTG->SetALabel( _T("TTG") );
     m_pitemBoxSizerLeg->Add( pTTG, 1, wxALIGN_LEFT | wxALL, 2 );
 
-//    Create CDI Display Window
-
+    //    Create CDI Display Window
     pCDI = new CDI( this, -1, wxSIMPLE_BORDER, _T("CDI") );
     m_pitemBoxSizerLeg->AddSpacer( 5 );
     m_pitemBoxSizerLeg->Add( pCDI, 0, wxALL | wxEXPAND, 2 );
@@ -127,14 +118,24 @@ long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
     m_pitemBoxSizerLeg->SetSizeHints( this );
     Layout();
     Fit();
-
-    pThisLegText->SetLabel( _("Route") );
     
     Hide();
+
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/Settings/AutopilotControl" ) );
+#ifdef __WXGTK__
+    Move(0, 0);        // workaround for gtk autocentre dialog behavior
+#endif
+    Move(pConf->Read ( _T ( "ConsolePosX" ), 20L ), pConf->Read ( _T ( "ConsolePosY" ), 20L ));
 }
 
 ConsoleCanvas::~ConsoleCanvas()
 {
+    wxFileConfig *pConf = GetOCPNConfigObject();
+    pConf->SetPath ( _T( "/Settings/AutopilotControl" ) );
+    wxPoint p = GetPosition();
+    pConf->Write ( _T ( "ConsolePosX" ), p.x );
+    pConf->Write ( _T ( "ConsolePosY" ), p.y );
     delete pCDI;
 }
     
@@ -144,17 +145,14 @@ void ConsoleCanvas::SetColorScheme( PI_ColorScheme cs )
             wxBRUSHSTYLE_SOLID );
     SetBackgroundColour( *wxBLACK );
 
-    pThisLegText->SetLabel( _("Route") );
-    
     //  Also apply color scheme to all known children
-
-    pThisLegText->SetBackgroundColour( *wxBLACK );
 
     pXTE->SetColorScheme( cs );
     pBRG->SetColorScheme( cs );
     pRNG->SetColorScheme( cs );
     pTTG->SetColorScheme( cs );
     pVMG->SetColorScheme( cs );
+    pETA->SetColorScheme( cs );
 
     pCDI->SetColorScheme( cs );
 }
@@ -172,35 +170,27 @@ void ConsoleCanvas::OnPaint( wxPaintEvent& event )
 
         UpdateRouteData();
     }
-
-    if( ! g_bShowActiveRouteHighway ) pCDI->Hide();
 #endif    
 }
 
 void ConsoleCanvas::OnShow( wxShowEvent& event )
 {
-//    pCDI->Show( g_bShowActiveRouteHighway );
+    pXTE->Show( m_pi.prefs.ActiveRouteLabel("XTE") );
+    pBRG->Show( m_pi.prefs.ActiveRouteLabel("BRG") );
+    pRNG->Show( m_pi.prefs.ActiveRouteLabel("RNG") );
+    pTTG->Show( m_pi.prefs.ActiveRouteLabel("TTG") );
+    pVMG->Show( m_pi.prefs.ActiveRouteLabel("VMG") );
+    pETA->Show( m_pi.prefs.ActiveRouteLabel("ETA") );
+    pCDI->Show( m_pi.prefs.ActiveRouteLabel("Highway") );
+
     m_pitemBoxSizerLeg->SetSizeHints( this );
-}
-
-void ConsoleCanvas::LegRoute()
-{
-    pThisLegText->SetLabel( _("Route") );
-
-    pThisLegText->Refresh( true );
-    RefreshConsoleData();
 }
 
 void ConsoleCanvas::OnContextMenu( wxContextMenuEvent& event ) {
     wxMenu* contextMenu = new wxMenu();
-    wxMenuItem* btnLeg = new wxMenuItem(contextMenu, ID_NAVLEG, _("This Leg"), _T(""), wxITEM_RADIO );
-    wxMenuItem* btnRoute = new wxMenuItem(contextMenu, ID_NAVROUTE, _("Full Route"), _T(""), wxITEM_RADIO );
-    wxMenuItem* btnHighw = new wxMenuItem(contextMenu, ID_NAVHIGHWAY, _("Show Highway"), _T(""), wxITEM_CHECK );
-    wxMenuItem* btnPreferences = new wxMenuItem(contextMenu, ID_PREFERENCES, _("Preferences"), _T(""), wxITEM_CHECK );
-    contextMenu->Append( btnLeg );
-    contextMenu->Append( btnRoute );
-    contextMenu->AppendSeparator();
-    contextMenu->Append( btnHighw );
+    wxMenuItem* btnDeactivate = new wxMenuItem(contextMenu, ID_DEACTIVATE, _("Deactivate"), _T("") );
+    wxMenuItem* btnPreferences = new wxMenuItem(contextMenu, ID_PREFERENCES, _("Preferences"), _T("") );
+    contextMenu->Append( btnDeactivate );
     contextMenu->Append( btnPreferences );
 
     PopupMenu( contextMenu );
@@ -210,115 +200,82 @@ void ConsoleCanvas::OnContextMenu( wxContextMenuEvent& event ) {
 
 void ConsoleCanvas::OnContextMenuSelection( wxCommandEvent& event ) {
     switch( event.GetId() ) {
-        case ID_NAVLEG: {
-            LegRoute();
+        case ID_DEACTIVATE:
+            m_pi.DeactivateRoute();
             break;
-        }
-        case ID_NAVROUTE: {
-            LegRoute();
-            break;
-        }
-        case ID_NAVHIGHWAY: {
-            pCDI->Show();
-            m_pitemBoxSizerLeg->SetSizeHints( this );
-        } break;
         case ID_PREFERENCES:
             m_pi.ShowPreferences();
             break;
     }
 }
 
-void ConsoleCanvas::ToggleRouteTotalDisplay()
-{
-    LegRoute();
-}
-    
 void ConsoleCanvas::UpdateRouteData()
 {
     wxString str_buf;
-#if 0
-    if( g_pRouteMan->GetpActiveRoute() )
+    double sog, cog, brg, xte, rng, nrng;
+    if(!m_pi.GetConsoleInfo(sog, cog, brg, xte, &rng, &nrng))
+        return;
+    
+    wxString cogstr;
+//            if( g_bShowTrue )
+    cogstr << wxString::Format( wxString("%6.0f", wxConvUTF8 ), brg );
+//            if( g_bShowMag )
+//                cogstr << wxString::Format( wxString("%6.0f(M)", wxConvUTF8 ), gFrame->GetMag( dcog ) );
+    pBRG->SetAValue( cogstr );
+
+    // VMG
+    // VMG is always to next waypoint, not to end of route
+    // VMG is SOG x cosine (difference between COG and BRG to Waypoint)
+    double VMG = 0.;
+    if( !wxIsNaN(cog) && !wxIsNaN(sog) )
     {
-        if( g_pRouteMan->m_bDataValid )
-        {
-            // Range to the next waypoint is needed always
-            float rng = g_pRouteMan->GetCurrentRngToActivePoint();
+        VMG = sog * cos( ( brg - cog ) * M_PI / 180. ) ;
+        str_buf.Printf( _T("%6.2f"), toUsrSpeed_Plugin( VMG ) );
+    }
+    else
+        str_buf = _T("---");
 
-            // Brg to the next waypoint
-            float dcog = g_pRouteMan->GetCurrentBrgToActivePoint();
-            if( dcog >= 359.5 )
-                dcog = 0;
+    pVMG->SetAValue( str_buf );
+        
+    wxString srng;
+    double deltarng = fabs( rng - nrng );
+    // show if there is more than 10% difference in ranges, etc...        
+    if( ( deltarng > .01 ) && ( ( deltarng / rng ) > .10 ) && ( rng < 10.0 ) ) {
+        if( nrng < 10.0 )
+            srng.Printf( _T("%5.2f/%5.2f"), toUsrDistance_Plugin( rng ), toUsrDistance_Plugin( nrng ) );
+        else
+            srng.Printf( _T("%5.1f/%5.1f"), toUsrDistance_Plugin( rng ), toUsrDistance_Plugin( nrng ) );
+    } else {
+        if( rng < 10.0 )
+            srng.Printf( _T("%6.2f"), toUsrDistance_Plugin( rng ) );
+        else
+            srng.Printf( _T("%6.1f"), toUsrDistance_Plugin( rng ) );
+    }
             
-            wxString cogstr;
-            if( g_bShowTrue )
-                cogstr << wxString::Format( wxString("%6.0f", wxConvUTF8 ), dcog );
-            if( g_bShowMag )
-                cogstr << wxString::Format( wxString("%6.0f(M)", wxConvUTF8 ), gFrame->GetMag( dcog ) );
-            
-            pBRG->SetAValue( cogstr );
-
-            // VMG
-            // VMG is always to next waypoint, not to end of route
-            // VMG is SOG x cosine (difference between COG and BRG to Waypoint)
-            double VMG = 0.;
-            if( !wxIsNaN(gCog) && !wxIsNaN(gSog) )
-            {
-                double BRG;
-                BRG = g_pRouteMan->GetCurrentBrgToActivePoint();
-                VMG = gSog * cos( ( BRG - gCog ) * PI / 180. ) ;
-                str_buf.Printf( _T("%6.2f"), toUsrSpeed( VMG ) );
-            }
-            else
-                str_buf = _T("---");
-
-            pVMG->SetAValue( str_buf );
-
-            if( !g_bShowRouteTotal )
-            {
-                float nrng = g_pRouteMan->GetCurrentRngToActiveNormalArrival();
-                wxString srng;
-                double deltarng = fabs( rng - nrng );
-                if( ( deltarng > .01 ) && ( ( deltarng / rng ) > .10 ) && ( rng < 10.0 ) ) // show if there is more than 10% difference in ranges, etc...
-                {
-                    if( nrng < 10.0 )
-                        srng.Printf( _T("%5.2f/%5.2f"), toUsrDistance( rng ), toUsrDistance( nrng ) );
-                    else
-                        srng.Printf( _T("%5.1f/%5.1f"), toUsrDistance( rng ), toUsrDistance( nrng ) );
-                }
-                else
-                {
-                    if( rng < 10.0 )
-                        srng.Printf( _T("%6.2f"), toUsrDistance( rng ) );
-                    else
-                        srng.Printf( _T("%6.1f"), toUsrDistance( rng ) );
-                }
-
-                //RNG to the next WPT
-                pRNG->SetAValue( srng );
-                // XTE
-                str_buf.Printf( _T("%6.2f"), toUsrDistance( g_pRouteMan->GetCurrentXTEToActivePoint() ) );
-                pXTE->SetAValue( str_buf );
-                if( g_pRouteMan->GetXTEDir() < 0 )
-                    pXTE->SetALabel( wxString( _("XTE         L") ) );
-                else
-                    pXTE->SetALabel( wxString( _("XTE         R") ) );
-                // TTG
-                // In all cases, ttg/eta are declared invalid if VMG <= 0.
-                // If showing only "this leg", use VMG for calculation of ttg
-                wxString ttg_s;
-                if( ( VMG > 0. ) && !wxIsNaN(gCog) && !wxIsNaN(gSog) )
-                {
-                    float ttg_sec = ( rng / VMG ) * 3600.;
-                    wxTimeSpan ttg_span( 0, 0, long( ttg_sec ), 0 );
-                    ttg_s = ttg_span.Format();
-                }
-                else
-                    ttg_s = _T("---");
-
-                pTTG->SetAValue( ttg_s );
-            }
-            else
-            {
+    //RNG to the next WPT
+    pRNG->SetAValue( srng );
+    // XTE
+    str_buf.Printf( _T("%6.2f"), toUsrDistance_Plugin( fabs(xte) ));
+    pXTE->SetAValue( str_buf );
+    if( xte < 0 )
+        pXTE->SetALabel( wxString( _("XTE         L") ) );
+    else
+        pXTE->SetALabel( wxString( _("XTE         R") ) );
+    
+    // TTG
+    // In all cases, ttg/eta are declared invalid if VMG <= 0.
+    // If showing only "this leg", use VMG for calculation of ttg
+    wxString ttg_s;
+    if( ( VMG > 0. ) && !wxIsNaN(cog) && !wxIsNaN(sog) ) {
+        float ttg_sec = ( rng / VMG ) * 3600.;
+        wxTimeSpan ttg_span( 0, 0, long( ttg_sec ), 0 );
+        ttg_s = ttg_span.Format();
+    } else
+        ttg_s = _T("---");
+    
+    pTTG->SetAValue( ttg_s );
+#if 0
+    {
                 //    Remainder of route
                 float trng = rng;
 
@@ -342,9 +299,9 @@ void ConsoleCanvas::UpdateRouteData()
     //                total rng
                 wxString strng;
                 if( trng < 10.0 )
-                    strng.Printf( _T("%6.2f"), toUsrDistance( trng ) );
+                    strng.Printf( _T("%6.2f"), toUsrDistance_Plugin( trng ) );
                 else
-                    strng.Printf( _T("%6.1f"), toUsrDistance( trng ) );
+                    strng.Printf( _T("%6.1f"), toUsrDistance_Plugin( trng ) );
 
                 pRNG->SetAValue( strng );
 
@@ -386,33 +343,21 @@ void ConsoleCanvas::UpdateRouteData()
                 pXTE->SetAValue( seta );
                 pXTE->SetALabel( wxString( _("ETA          ") ) );
             }
-
-            pRNG->Refresh();
-            pBRG->Refresh();
-            pVMG->Refresh();
-            pTTG->Refresh();
-            pXTE->Refresh();
-        }
-    }
 #endif
-}
 
-void ConsoleCanvas::RefreshConsoleData( void )
-{
-    UpdateRouteData();
-
-    pRNG->Refresh();
-    pBRG->Refresh();
-    pVMG->Refresh();
-    pTTG->Refresh();
     pXTE->Refresh();
+    pBRG->Refresh();
+    pRNG->Refresh();
+    pTTG->Refresh();
+    pVMG->Refresh();
+    pETA->Refresh();
     pCDI->Refresh();
 }
 
 void ConsoleCanvas::ShowWithFreshFonts( void )
 {
     Hide();
-    Move( 0, 0 );
+//    Move( 0, 0 );
 
     UpdateFonts();
     Show();
@@ -421,11 +366,12 @@ void ConsoleCanvas::ShowWithFreshFonts( void )
 
 void ConsoleCanvas::UpdateFonts( void )
 {
-    pBRG->RefreshFonts();
     pXTE->RefreshFonts();
-    pTTG->RefreshFonts();
+    pBRG->RefreshFonts();
     pRNG->RefreshFonts();
+    pTTG->RefreshFonts();
     pVMG->RefreshFonts();
+    pETA->RefreshFonts();
 
     m_pitemBoxSizerLeg->SetSizeHints( this );
     Layout();
@@ -475,7 +421,7 @@ void AnnunText::MouseEvent( wxMouseEvent& event )
     else if( event.LeftDown() ) {
         ConsoleCanvas *ccp = dynamic_cast<ConsoleCanvas*>(GetParent());
         if(ccp){
-            ccp->ToggleRouteTotalDisplay();
+            //ccp->ToggleRouteTotalDisplay();
         }
     }
     
@@ -519,8 +465,10 @@ void AnnunText::RefreshFonts()
 //    m_plabelFont = FontMgr::Get().GetFont( m_LegendTextElement );
 //    m_pvalueFont = FontMgr::Get().GetFont( m_ValueTextElement );
 
-    m_legend_color = *wxBLACK;
-    m_val_color = *wxBLACK;
+//    m_legend_color = FontMgr::Get().GetFontColor( _("Console Legend") );
+//    m_val_color = FontMgr::Get().GetFontColor( _("Console Value") );
+    m_legend_color = *wxWHITE;
+    m_val_color = *wxWHITE;
     
     CalculateMinSize();
     
@@ -664,19 +612,17 @@ void CDI::OnPaint( wxPaintEvent& event )
 
     int path_length = sy * 3;
     int pix_per_xte = 120;
-#if 0
-    if( g_pRouteMan->GetpActiveRoute() ) {
-        double angle = 90 - ( g_pRouteMan->GetCurrentSegmentCourse() - gCog );
 
-        double dy = path_length * sin( angle * PI / 180. );
-        double dx = path_length * cos( angle * PI / 180. );
+    double sog, cog, brg, xte;
+    ConsoleCanvas *ccp = dynamic_cast<ConsoleCanvas*>(GetParent());
+    if(ccp->m_pi.GetConsoleInfo(sog, cog, brg, xte, 0, 0)) {
+        double angle = 90 - ( brg - cog );
 
-        int xtedir;
-        xtedir = g_pRouteMan->GetXTEDir();
-        double xte = g_pRouteMan->GetCurrentXTEToActivePoint();
+        double dy = path_length * sin( angle * M_PI / 180. );
+        double dx = path_length * cos( angle * M_PI / 180. );
 
-        double ddy = xtedir * pix_per_xte * xte * sin( ( 90 - angle ) * PI / 180. );
-        double ddx = xtedir * pix_per_xte * xte * cos( ( 90 - angle ) * PI / 180. );
+        double ddy = pix_per_xte * xte * sin( ( 90 - angle ) * M_PI / 180. );
+        double ddx =  pix_per_xte * xte * cos( ( 90 - angle ) * M_PI / 180. );
 
         int ddxi = (int) ddx;
         int ddyi = (int) ddy;
@@ -691,17 +637,17 @@ void CDI::OnPaint( wxPaintEvent& event )
         int road_top_width = 10;
         int road_bot_width = 40;
 
-        road[0].x = xc1 - (int) ( road_bot_width * cos( ( 90 - angle ) * PI / 180. ) );
-        road[0].y = yc1 - (int) ( road_bot_width * sin( ( 90 - angle ) * PI / 180. ) );
+        road[0].x = xc1 - (int) ( road_bot_width * cos( ( 90 - angle ) * M_PI / 180. ) );
+        road[0].y = yc1 - (int) ( road_bot_width * sin( ( 90 - angle ) * M_PI / 180. ) );
 
-        road[1].x = xc2 - (int) ( road_top_width * cos( ( 90 - angle ) * PI / 180. ) );
-        road[1].y = yc2 - (int) ( road_top_width * sin( ( 90 - angle ) * PI / 180. ) );
+        road[1].x = xc2 - (int) ( road_top_width * cos( ( 90 - angle ) * M_PI / 180. ) );
+        road[1].y = yc2 - (int) ( road_top_width * sin( ( 90 - angle ) * M_PI / 180. ) );
 
-        road[2].x = xc2 + (int) ( road_top_width * cos( ( 90 - angle ) * PI / 180. ) );
-        road[2].y = yc2 + (int) ( road_top_width * sin( ( 90 - angle ) * PI / 180. ) );
+        road[2].x = xc2 + (int) ( road_top_width * cos( ( 90 - angle ) * M_PI / 180. ) );
+        road[2].y = yc2 + (int) ( road_top_width * sin( ( 90 - angle ) * M_PI / 180. ) );
 
-        road[3].x = xc1 + (int) ( road_bot_width * cos( ( 90 - angle ) * PI / 180. ) );
-        road[3].y = yc1 + (int) ( road_bot_width * sin( ( 90 - angle ) * PI / 180. ) );
+        road[3].x = xc1 + (int) ( road_bot_width * cos( ( 90 - angle ) * M_PI / 180. ) );
+        road[3].y = yc1 + (int) ( road_bot_width * sin( ( 90 - angle ) * M_PI / 180. ) );
 
         mdc.SetBrush( *m_proadBrush );
         mdc.SetPen( *m_proadPen );
@@ -713,7 +659,7 @@ void CDI::OnPaint( wxPaintEvent& event )
         mdc.DrawCircle( xp, yp, 6 );
         mdc.DrawLine( xp, yp + 5, xp, yp - 5 );
     }
-#endif
+
     wxPaintDC dc( this );
     dc.Blit( 0, 0, sx, sy, &mdc, 0, 0 );
 }

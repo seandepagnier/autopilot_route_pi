@@ -82,6 +82,7 @@ autopilot_route_pi::autopilot_route_pi(void *ppimgr)
     initialize_images();
     m_ConsoleCanvas = NULL;
     m_PreferencesDialog = NULL;
+    m_avg_sog=0;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -123,31 +124,19 @@ int autopilot_route_pi::Init(void)
     p.boundary_guid = pConf->Read("Boundary", "");
     p.boundary_width = pConf->Read("BoundaryWidth", 30);
 
-    // Display
-    p.toolbar_icon = pConf->Read("ToolbarIcon", true);
-
     // NMEA output
-    p.talkerID = pConf->Read("TalkerID", "AR").Truncate(2);
     wxString sentences = pConf->Read("NMEASentences", "APB;");
     while(sentences.size()) {
         p.nmea_sentences[labels.BeforeFirst(';')] = true;
         sentences = sentences.AfterFirst(';');
     }
 
-    
-    if(p.toolbar_icon) {
-            m_leftclick_tool_id  = InsertPlugInTool
-        (_T(""), _img_autopilot_route, _img_autopilot_route, wxITEM_NORMAL,
-         _("Autopilot Route"), _T(""), NULL, -1, 0, this);
-    }
-    
     PlugInHandleAutopilotRoute(true);
     m_Timer.Connect(wxEVT_TIMER, wxTimerEventHandler
                     ( autopilot_route_pi::OnTimer ), NULL, this);
 
     return (WANTS_OVERLAY_CALLBACK |
             WANTS_OPENGL_OVERLAY_CALLBACK |
-            WANTS_TOOLBAR_CALLBACK    |
             WANTS_CURSOR_LATLON       |
             WANTS_NMEA_SENTENCES      |
             WANTS_NMEA_EVENTS         |
@@ -161,6 +150,7 @@ bool autopilot_route_pi::DeInit(void)
 {
     PlugInHandleAutopilotRoute(false);
     delete m_PreferencesDialog;
+    delete m_ConsoleCanvas;
     
     m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( autopilot_route_pi::OnTimer ), NULL, this);
     
@@ -195,11 +185,7 @@ bool autopilot_route_pi::DeInit(void)
     pConf->Write("Boundary", p.boundary_guid);
     pConf->Write("BoundaryWidth", p.boundary_width);
 
-    // Display
-    pConf->Write("ToolbarIcon", p.toolbar_icon);
-    
     // NMEA output
-    pConf->Write("TalkerID", p.talkerID);
     wxString sentences;
     for(std::map<wxString, bool>::iterator it = p.nmea_sentences.begin();
         it != p.nmea_sentences.end(); it++)
@@ -251,11 +237,6 @@ wxString autopilot_route_pi::GetLongDescription()
 Configurable Autopilot Route following abilities.");
 }
 
-int autopilot_route_pi::GetToolbarToolCount(void)
-{
-    return 1;
-}
-
 void autopilot_route_pi::SetColorScheme(PI_ColorScheme cs)
 {
     m_colorscheme = cs;
@@ -272,11 +253,6 @@ void autopilot_route_pi::ShowPreferencesDialog( wxWindow* parent )
     
     delete m_PreferencesDialog;
     m_PreferencesDialog = NULL;
-}
-
-void autopilot_route_pi::OnToolbarToolCallback(int id)
-{
-    ShowConsoleCanvas();
 }
 
 bool autopilot_route_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
@@ -303,6 +279,7 @@ void autopilot_route_pi::ShowConsoleCanvas()
     }
 
     m_ConsoleCanvas->Show();
+    m_ConsoleCanvas->ShowWithFreshFonts();
 }
 
 void autopilot_route_pi::ShowPreferences()
@@ -365,6 +342,41 @@ double autopilot_route_pi::Declination()
     return m_declination;
 }
 
+bool autopilot_route_pi::GetConsoleInfo(double &sog, double &cog,
+                                        double &bearing, double &xte,
+                                        double *rng, double *nrng)
+{
+    if(m_current_wp.GUID.IsEmpty())
+        return false;
+    sog = m_lastfix.Sog;
+    cog = m_lastfix.Cog;
+    bearing = m_current_bearing;
+    xte = m_current_xte;
+
+    if(rng) {
+        double rbrg;
+        ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon,
+                         m_current_wp.lat, m_current_wp.lon, &rbrg, rng);
+        *nrng = *rng * acos((rbrg - bearing)*M_PI/180);
+    }
+    
+    return true;
+}
+
+static void SendPluginMessageEmpty(wxString id)
+{
+    wxJSONWriter w;
+    wxString out;
+    wxJSONValue v;
+    w.Write(v, out);
+    SendPluginMessage(id, out);
+}
+
+void autopilot_route_pi::DeactivateRoute()
+{
+    SendPluginMessageEmpty("OCPN_RTE_DEACTIVATED");
+}
+
 void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
 {
     if(m_active_guid.IsEmpty())
@@ -374,6 +386,12 @@ void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
         RenderArrivalWaypoint(dc, vp);
     else
         RenderRoutePositionBearing(dc, vp);
+    
+    wxPoint r1, r2;
+    GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
+    GetCanvasPixLL(&vp, &r2, m_lastfix.Lat, m_lastfix.Lon);
+    dc.SetPen(wxPen(*wxRED, 2));
+    dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
 void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
@@ -382,16 +400,16 @@ void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
         return;
 
     wxPoint r1, r2;
-    dc.SetPen(wxPen(*wxRED, 2));
-    GetCanvasPixLL(&vp, &r2, m_current_wp.lat, m_current_wp.lon);
-    GetCanvasPixLL(&vp, &r2, m_current_wp.lat + m_current_wp.arrival_radius/1853.0/60.0, m_current_wp.lon);
+    dc.SetPen(wxPen(*wxGREEN, 2));
+    GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
+    GetCanvasPixLL(&vp, &r2, m_current_wp.lat + m_current_wp.arrival_radius/60.0, m_current_wp.lon);
 
     double radius = hypot(r1.x-r2.x, r1.y-r2.y);
     dc.DrawCircle( r1.x, r1.y, radius );
 
     dc.SetPen(wxPen(*wxGREEN, 1));
     double lat, lon;
-    double dist = 5 * m_current_wp.arrival_radius/1853.0/60.0;
+    double dist = 5 * m_current_wp.arrival_radius;
     
     ll_gc_ll(m_current_wp.lat, m_current_wp.lon, m_current_wp.arrival_bearing + 90, dist, &lat, &lon);
     GetCanvasPixLL(&vp, &r2, lat, lon);
@@ -404,14 +422,10 @@ void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
 
 void autopilot_route_pi::RenderRoutePositionBearing(apDC &dc, PlugIn_ViewPort &vp)
 {
-    wxPoint r1, r2;
-    dc.SetPen(wxPen(*wxRED, 2));
+    wxPoint r1;
+    dc.SetPen(wxPen(*wxGREEN, 2));
     GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
     dc.DrawCircle( r1.x, r1.y, 10 );
-    
-    dc.SetPen(wxPen(*wxGREEN, 1));
-    GetCanvasPixLL(&vp, &r2, m_lastfix.Lat, m_lastfix.Lon);
-    dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
 void autopilot_route_pi::OnTimer( wxTimerEvent & )
@@ -425,6 +439,9 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
     case preferences::WAYPOINT_BEARING: ComputeWaypointBearing(); break;
     case preferences::ROUTE_POSITION_BEARING:  ComputeRoutePositionBearing();   break;
     }
+
+    m_ConsoleCanvas->UpdateRouteData();
+    SendNMEA();
 }
 
 void autopilot_route_pi::SetCursorLatLon(double lat, double lon)
@@ -437,12 +454,14 @@ void autopilot_route_pi::SetCursorLatLon(double lat, double lon)
 
 void autopilot_route_pi::SetNMEASentence(wxString &sentence)
 {
-
+    // Check for conflicting autopilot messages
 }
 
 void autopilot_route_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 {
     m_lastfix = pfix;
+    if(pfix.nSats > 3)
+        m_avg_sog = m_avg_sog*.9 + pfix.Sog*.1;
 }
 
 static bool ParseMessage(wxString &message_body, wxJSONValue &root)
@@ -524,6 +543,10 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                     double lat = w[i]["lat"].AsDouble(), lon = w[i]["lon"].AsDouble();
                     waypoint wp(lat, lon, w[i]["Name"].AsString(), w[i]["GUID"].AsString(),
                                 w[i]["ArrivalRadius"].AsDouble(), lat0, lon0);
+
+                    // set arrival bearing to current course for first waypoint
+                    if(i == 0 && m_avg_sog > 1)
+                        wp.arrival_bearing = m_lastfix.Cog;
                     m_route.push_back(wp);
                     lat0 = lat, lon0 = lon;
                 }
@@ -539,31 +562,24 @@ void autopilot_route_pi::RearrangeWindow()
     SetColorScheme(PI_ColorScheme());
 }
 
-void SendPluginMessageEmpty(wxString id)
-{
-    wxJSONWriter w;
-    wxString out;
-    wxJSONValue v;
-    w.Write(v, out);
-    SendPluginMessage(id, out);
-}
-
-void autopilot_route_pi::DeactivateRoute()
-{
-    SendPluginMessageEmpty("OCPN_RTE_DEACTIVATED");
-}
-
 void autopilot_route_pi::AdvanceWaypoint()
 {
     for(ap_route_iterator it=m_route.begin(); it!=m_route.end(); it++) {
         if(m_current_wp.GUID != it->GUID)
             continue;
-        
+
         if(++it == m_route.end()) {
             // reached destination
             SendPluginMessageEmpty("OCPN_RTE_ENDED");
             DeactivateRoute();
         }
+        if(prefs.confirm_bearing_change) {
+            wxMessageDialog mdlg(GetOCPNCanvasWindow(), _("Advance Waypoint?"),
+                                 _("Autopilot Route"), wxYES | wxNO);
+            if(mdlg.ShowModal() == wxID_NO)
+                break;
+        }
+
         m_last_wp_name = m_current_wp.name;
         m_current_wp = *it;
         return;
@@ -627,10 +643,11 @@ void autopilot_route_pi::ComputeXTE()
     UpdateWaypoint();
 
     double xte = FindXTE();
-    m_xte_rate = xte - m_last_xte;
-    m_last_xte = xte;
+    m_xte_rate = xte - m_current_xte;
+    m_current_xte = xte;
     
-    SendAPB(m_current_wp.arrival_bearing, xte*prefs.xte_multiplier + m_xte_rate*prefs.xte_rate_multiplier);
+    m_current_bearing = m_current_wp.arrival_bearing;
+    m_current_xte = xte*prefs.xte_multiplier + m_xte_rate*prefs.xte_rate_multiplier;
 }
 
 void autopilot_route_pi::ComputeBoundaryXTE()
@@ -639,16 +656,16 @@ void autopilot_route_pi::ComputeBoundaryXTE()
     double xte = FindXTE();
 
     // find distance to edge of boundary and apply
-    SendAPB(m_current_wp.arrival_bearing, xte*prefs.xte_boundary_multiplier);
+    m_current_bearing = m_current_wp.arrival_bearing;
+    m_current_xte = xte*prefs.xte_boundary_multiplier;
 }
 
 void autopilot_route_pi::ComputeWaypointBearing()
 {
     UpdateWaypoint();    
-    double bearing;
     ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
-                     &bearing, 0);
-    SendAPB(bearing, 0);
+                     &m_current_bearing, 0);
+    m_current_xte = 0;
 }
 
 void autopilot_route_pi::ComputeRoutePositionBearing()
@@ -689,24 +706,23 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     m_current_wp.lon = w.lon;
     m_current_wp.GUID = "";
 
-    double bearing;
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &bearing, 0);
-    SendAPB(0, bearing);
+    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
+    m_current_xte = 0;
 }
 
 NMEA0183    NMEA0183;
 
-void autopilot_route_pi::SendRMB(double bearing, double xte)
+void autopilot_route_pi::SendRMB()
 {
     if(!prefs.NmeaSentences("RMB"))
         return;
 
-    NMEA0183.TalkerID = prefs.talkerID;
+    NMEA0183.TalkerID = "EC"; // overrided by opencpn anyway
 
     SENTENCE snt;
     NMEA0183.Rmb.IsDataValid = NTrue;
-    NMEA0183.Rmb.CrossTrackError = xte;
-    NMEA0183.Xte.DirectionToSteer = xte < 0 ? Left : Right;
+    NMEA0183.Rmb.CrossTrackError = m_current_xte;
+    NMEA0183.Xte.DirectionToSteer = m_current_xte < 0 ? Left : Right;
     NMEA0183.Rmb.To = m_current_wp.name.Truncate( 6 );
     NMEA0183.Rmb.From = m_last_wp_name.Truncate( 6 );
 
@@ -717,7 +733,7 @@ void autopilot_route_pi::SendRMB(double bearing, double xte)
 
     double brg, dist;
     ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
-                     &bearing, &dist);
+                     &brg, &dist);
     NMEA0183.Rmb.RangeToDestinationNauticalMiles = dist;
     NMEA0183.Rmb.BearingToDestinationDegreesTrue = brg;
     NMEA0183.Rmb.DestinationClosingVelocityKnots = m_lastfix.Sog;
@@ -728,12 +744,12 @@ void autopilot_route_pi::SendRMB(double bearing, double xte)
     PushNMEABuffer( snt.Sentence  );
 }
 
-void autopilot_route_pi::SendRMC(double bearing, double xte)
+void autopilot_route_pi::SendRMC()
 {
     if(!prefs.NmeaSentences("RMC"))
         return;
 
-    NMEA0183.TalkerID = prefs.talkerID;
+    NMEA0183.TalkerID = "EC"; // overrided by opencpn anyway
 
     SENTENCE snt;
     NMEA0183.Rmc.IsDataValid = NTrue;
@@ -763,18 +779,18 @@ void autopilot_route_pi::SendRMC(double bearing, double xte)
     PushNMEABuffer( snt.Sentence  );
 }
 
-void autopilot_route_pi::SendAPB(double bearing, double xte)
+void autopilot_route_pi::SendAPB()
 {
     if(!prefs.NmeaSentences("APB"))
         return;
     
     // compute APB sentence
-    NMEA0183.TalkerID = prefs.talkerID; // autopilot route plugin id
+    NMEA0183.TalkerID = "EC"; // overrided by opencpn anyway
     NMEA0183.Apb.IsLoranBlinkOK = NTrue;
     NMEA0183.Apb.IsLoranCCycleLockOK = NTrue;
-    NMEA0183.Apb.CrossTrackErrorMagnitude = fabs(xte);
-    NMEA0183.Apb.DirectionToSteer = xte < 0 ? Left : Right;
-    NMEA0183.Apb.CrossTrackUnits = _T("N");
+    NMEA0183.Apb.CrossTrackErrorMagnitude = fabs(m_current_xte);
+    NMEA0183.Apb.DirectionToSteer = m_current_xte < 0 ? Left : Right;
+    NMEA0183.Apb.CrossTrackUnits = "N";
     NMEA0183.Apb.IsArrivalCircleEntered = m_bArrival ? NTrue : NFalse;
 
     //  We never pass the perpendicular, since we declare arrival before reaching this point
@@ -805,7 +821,7 @@ void autopilot_route_pi::SendAPB(double bearing, double xte)
         NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("T");
             
 
-        NMEA0183.Apb.HeadingToSteer = bearing;
+        NMEA0183.Apb.HeadingToSteer = m_current_bearing;
         NMEA0183.Apb.HeadingToSteerUnits = _T("T");
     }
     SENTENCE snt;
@@ -813,29 +829,28 @@ void autopilot_route_pi::SendAPB(double bearing, double xte)
     PushNMEABuffer( snt.Sentence  );
 }
 
-void autopilot_route_pi::SendXTE( double xte)
+void autopilot_route_pi::SendXTE()
 {
     if(!prefs.NmeaSentences("XTE"))
         return;
     
     // compute XTE sentence
-    NMEA0183.TalkerID = prefs.talkerID; // autopilot route plugin id
+    NMEA0183.TalkerID = "EC"; // overrided by opencpn anyway
             
     SENTENCE snt;
-             
     NMEA0183.Xte.IsLoranBlinkOK = NTrue;
     NMEA0183.Xte.IsLoranCCycleLockOK = NTrue;
-    NMEA0183.Xte.CrossTrackErrorDistance = fabs(xte);
-    NMEA0183.Xte.DirectionToSteer = xte < 0 ? Left : Right;
+    NMEA0183.Xte.CrossTrackErrorDistance = fabs(m_current_xte);
+    NMEA0183.Xte.DirectionToSteer = m_current_xte < 0 ? Left : Right;
     NMEA0183.Xte.CrossTrackUnits = _T("N");
     NMEA0183.Xte.Write( snt );
     PushNMEABuffer( snt.Sentence  );
 }
 
-void autopilot_route_pi::Send(double bearing, double xte)
+void autopilot_route_pi::SendNMEA()
 {
-    SendRMB(bearing, xte);
-    SendRMC(bearing, xte);
-    SendAPB(bearing, xte);
-    SendXTE(xte);
+    SendRMB();
+    SendRMC();
+    SendAPB();
+    SendXTE();
 }

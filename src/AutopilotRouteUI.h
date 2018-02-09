@@ -73,7 +73,6 @@ class PreferencesDialogBase : public wxDialog
 		wxSpinCtrl* m_sBoundaryWidth;
 		wxStaticText* m_staticText72;
 		wxCheckBox* m_cbConfirmBearingChange;
-		wxCheckBox* m_cbToolbarIcon;
 		wxButton* m_button4;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;

@@ -43,7 +43,7 @@ bool PreferencesDialog::Show( bool show )
         m_sRoutePositionBearingTime->SetValue(p.route_position_bearing_time);
     
         // Active Route Window
-        for(int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
+        for(unsigned int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
             if(p.active_route_labels.find(m_cbActiveRouteItems->GetString(i)) != p.active_route_labels.end())
                 m_cbActiveRouteItems->Check(i, p.active_route_labels[m_cbActiveRouteItems->GetString(i)]);
 
@@ -54,12 +54,8 @@ bool PreferencesDialog::Show( bool show )
         m_tBoundary->SetValue(p.boundary_guid);
         m_sBoundaryWidth->SetValue(p.boundary_width);
 
-        // Display
-        m_cbToolbarIcon->SetValue(p.toolbar_icon);
-
         // NMEA output
-        m_tTalkerID->SetValue(p.talkerID);
-        for(int i=0; i<m_cbNMEASentences->GetCount(); i++)
+        for(unsigned int i=0; i<m_cbNMEASentences->GetCount(); i++)
             if(p.nmea_sentences.find(m_cbNMEASentences->GetString(i)) != p.nmea_sentences.end())
                 m_cbNMEASentences->Check(i, p.nmea_sentences[m_cbNMEASentences->GetString(i)]);
     }
@@ -102,7 +98,7 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.route_position_bearing_time = m_sRoutePositionBearingTime->GetValue();
     
     // Active Route Window
-    for(int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
+    for(unsigned int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
         p.active_route_labels[m_cbActiveRouteItems->GetString(i)] = m_cbActiveRouteItems->IsChecked(i);
 
     // Waypoint Arrival
@@ -112,15 +108,14 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.boundary_guid = m_tBoundary->GetValue();
     p.boundary_width = m_sBoundaryWidth->GetValue();
 
-    // Display
-    p.toolbar_icon = m_cbToolbarIcon->GetValue();
-            
     // NMEA output
-    p.talkerID = m_tTalkerID->GetValue().Truncate(2);
-    for(int i=0; i<m_cbNMEASentences->GetCount(); i++)
+    for(unsigned int i=0; i<m_cbNMEASentences->GetCount(); i++)
         p.nmea_sentences[m_cbNMEASentences->GetString(i)] = m_cbNMEASentences->IsChecked(i);
 
     if(IsModal())
         EndModal(wxID_OK);
-    Hide();
+    else {
+        m_pi.ShowConsoleCanvas(); // update fields
+        Hide();
+    }
 }

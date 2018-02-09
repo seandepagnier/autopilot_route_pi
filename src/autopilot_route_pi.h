@@ -108,9 +108,7 @@ public:
     wxString GetLongDescription();
 
     void SetColorScheme(PI_ColorScheme cs);
-    int GetToolbarToolCount(void);
     void ShowPreferencesDialog( wxWindow* parent );
-    void OnToolbarToolCallback(int id);
 
     bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
     bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
@@ -154,11 +152,7 @@ public:
         wxString boundary_guid;
         int boundary_width;
 
-        // Display
-        bool toolbar_icon;
-
         // NMEA output
-        wxString talkerID;
         std::map<wxString, bool> nmea_sentences;
         bool NmeaSentences(wxString sentence) {
             if(nmea_sentences.find(sentence) != nmea_sentences.end())
@@ -167,6 +161,10 @@ public:
         }
     } prefs;
 
+    // for console canvas
+    bool GetConsoleInfo(double &sog, double &cog, double &bearing, double &xte,
+                        double *rng, double *nrng);
+    void DeactivateRoute();
 protected:
     void Render(apDC &dc, PlugIn_ViewPort &vp);
     void RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp);
@@ -184,7 +182,6 @@ private:
 
     void RearrangeWindow();
 
-    void DeactivateRoute();
     void AdvanceWaypoint();
     void UpdateWaypoint();
     double FindXTE();
@@ -193,11 +190,11 @@ private:
     void ComputeWaypointBearing();
     void ComputeRoutePositionBearing();
 
-    void SendRMB(double bearing, double xte);
-    void SendRMC(double bearing, double xte);
-    void SendAPB(double bearing, double xte);
-    void SendXTE( double xte);
-    void Send(double bearing, double xte);
+    void SendRMB();
+    void SendRMC();
+    void SendAPB();
+    void SendXTE();
+    void SendNMEA();
 
     int m_leftclick_tool_id;
     wxTimer m_Timer;
@@ -217,15 +214,18 @@ private:
     wxString m_last_wp_name, m_last_wpt_activated_guid;
 
     bool m_bArrival;
-    
+
+    double m_current_bearing, m_current_xte;
     // for xte mode
-    double m_xte_rate, m_last_xte;
+    double m_xte_rate;
 
     // for xte boundary mode
     
     // for bearing mode
     
     // optimum route mode variables
+
+    double m_avg_sog;
 };
 
 #endif

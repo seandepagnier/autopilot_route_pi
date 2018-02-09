@@ -121,11 +121,9 @@ public:
       void LegRoute();
       void OnContextMenu( wxContextMenuEvent& event );
       void OnContextMenuSelection( wxCommandEvent& event );
-      void RefreshConsoleData(void);
       void ToggleRouteTotalDisplay();
       
       wxWindow          *m_pParent;
-      wxStaticText       *pThisLegText;
       wxBoxSizer        *m_pitemBoxSizerLeg;
 
       AnnunText         *pXTE;
@@ -133,17 +131,18 @@ public:
       AnnunText         *pRNG;
       AnnunText         *pTTG;
       AnnunText         *pVMG;
+      AnnunText         *pETA;
       CDI               *pCDI;
 
       wxFont            *pThisLegFont;
-      bool              m_bNeedClear;
+      bool               m_bNeedClear;
       wxBrush           *pbackBrush;
 
+      autopilot_route_pi &m_pi;
 private:
       void OnPaint(wxPaintEvent& event);
       void OnShow(wxShowEvent& event);
 
-      autopilot_route_pi &m_pi;
 
 DECLARE_EVENT_TABLE()
 };

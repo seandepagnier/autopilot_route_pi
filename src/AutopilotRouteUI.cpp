@@ -169,7 +169,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	fgSizer16->Add( fgSizer17, 1, wxEXPAND, 5 );
 	
-	wxString m_cbActiveRouteItemsChoices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("ETA") };
+	wxString m_cbActiveRouteItemsChoices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("ETA"), _("Highway") };
 	int m_cbActiveRouteItemsNChoices = sizeof( m_cbActiveRouteItemsChoices ) / sizeof( wxString );
 	m_cbActiveRouteItems = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItemsNChoices, m_cbActiveRouteItemsChoices, 0 );
 	fgSizer16->Add( m_cbActiveRouteItems, 0, wxALL|wxEXPAND, 5 );
@@ -275,23 +275,6 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	
 	fgSizer8->Add( sbSizer10, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer8;
-	sbSizer8 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Display") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer53;
-	fgSizer53 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer53->SetFlexibleDirection( wxBOTH );
-	fgSizer53->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	m_cbToolbarIcon = new wxCheckBox( this, wxID_ANY, _("Toolbar Icon"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer53->Add( m_cbToolbarIcon, 0, wxALL, 5 );
-	
-	
-	sbSizer8->Add( fgSizer53, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer8->Add( sbSizer8, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer21;
 	fgSizer21 = new wxFlexGridSizer( 0, 2, 0, 0 );
