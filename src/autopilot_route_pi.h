@@ -62,8 +62,6 @@
 #include "msvcdefs.h"
 #endif
 
-double heading_resolve(double degrees);
-
 //----------------------------------
 //    The PlugIn Class Definition
 //----------------------------------
@@ -88,9 +86,9 @@ public:
 typedef std::list<waypoint> ap_route;
 typedef std::list<waypoint>::iterator ap_route_iterator;
 
-
 class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_110
 {
+    friend ConsoleCanvas;
 public:
 
     autopilot_route_pi(void *ppimgr);
@@ -138,10 +136,10 @@ public:
         double route_position_bearing_distance, route_position_bearing_time;
 
         // Active Route Window
-        std::map<wxString, bool> active_route_labels;
-        bool ActiveRouteLabel(wxString label) {
-            if(active_route_labels.find(label) != active_route_labels.end())
-                return active_route_labels[label];
+        std::map<wxString, bool> active_route_labels[2];
+        bool ActiveRouteLabel(int i, wxString label) {
+            if(active_route_labels[i].find(label) != active_route_labels[i].end())
+                return active_route_labels[i][label];
             return false;
         }
 
@@ -153,6 +151,8 @@ public:
         int boundary_width;
 
         // NMEA output
+        int rate;
+        bool magnetic;
         std::map<wxString, bool> nmea_sentences;
         bool NmeaSentences(wxString sentence) {
             if(nmea_sentences.find(sentence) != nmea_sentences.end())
@@ -189,6 +189,7 @@ private:
     void ComputeBoundaryXTE();
     void ComputeWaypointBearing();
     void ComputeRoutePositionBearing();
+    void MagneticHeading(double &val);
 
     void SendRMB();
     void SendRMC();
@@ -211,6 +212,7 @@ private:
     ap_route m_route;
 
     waypoint m_current_wp;
+    wxString m_next_route_wp_GUID;
     wxString m_last_wp_name, m_last_wpt_activated_guid;
 
     bool m_bArrival;

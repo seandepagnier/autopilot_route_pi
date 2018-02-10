@@ -40,11 +40,11 @@
 #include "PreferencesDialog.h"
 #include "icons.h"
 
-double heading_resolve(double degrees)
+double heading_resolve(double degrees, double offset=0)
 {
-    while(degrees < -180)
+    while(degrees < offset-180)
         degrees += 360;
-    while(degrees >= 180)
+    while(degrees >= offset+180)
         degrees -= 360;
     return degrees;
 }
@@ -83,6 +83,7 @@ autopilot_route_pi::autopilot_route_pi(void *ppimgr)
     m_ConsoleCanvas = NULL;
     m_PreferencesDialog = NULL;
     m_avg_sog=0;
+    m_declination = NAN;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -111,10 +112,13 @@ int autopilot_route_pi::Init(void)
     p.route_position_bearing_time = pConf->Read("RoutePositionBearingTime", 100);
     
     // Active Route Window
-    wxString labels = pConf->Read("ActiveRouteItems", "XTE;TTG;");
-    while(labels.size()) {
-        p.active_route_labels[labels.BeforeFirst(';')] = true;
-        labels = labels.AfterFirst(';');
+    wxString labels[2] = {pConf->Read("ActiveRouteItems0", "XTE;BRG;RNG;TTG;VMG;Highway;"),
+                          pConf->Read("ActiveRouteItems1", "XTE;Route ETA;Route RNG;Route TTG;Highway;")};
+    for(int i=0; i<2; i++) {
+        while(labels[i].size()) {
+            p.active_route_labels[i][labels[i].BeforeFirst(';')] = true;
+            labels[i] = labels[i].AfterFirst(';');
+        }
     }
 
     // Waypoint Arrival
@@ -125,9 +129,11 @@ int autopilot_route_pi::Init(void)
     p.boundary_width = pConf->Read("BoundaryWidth", 30);
 
     // NMEA output
+    p.rate = pConf->Read("NMEARate", 1L);
+    p.magnetic = pConf->Read("NMEAMagnetic", 0L);
     wxString sentences = pConf->Read("NMEASentences", "APB;");
     while(sentences.size()) {
-        p.nmea_sentences[labels.BeforeFirst(';')] = true;
+        p.nmea_sentences[sentences.BeforeFirst(';')] = true;
         sentences = sentences.AfterFirst(';');
     }
 
@@ -171,13 +177,14 @@ bool autopilot_route_pi::DeInit(void)
     pConf->Write("RoutePositionBearingTime", p.route_position_bearing_time);
     
     // Active Route Window
-    wxString labels;
-    for(std::map<wxString, bool>::iterator it = p.active_route_labels.begin();
-        it != p.active_route_labels.end(); it++)
-        if(p.active_route_labels[it->first])
-            labels += it->first + ";";
-    pConf->Write("ActiveRouteItems", labels);
-
+    for(int i=0; i<2; i++) {
+        wxString labels;
+        for(std::map<wxString, bool>::iterator it = p.active_route_labels[i].begin();
+            it != p.active_route_labels[i].end(); it++)
+            if(p.active_route_labels[i][it->first])
+                labels += it->first + ";";
+        pConf->Write("ActiveRouteItems"+wxString::Format("%d", i), labels);
+    }
     // Waypoint Arrival
     pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
 
@@ -186,6 +193,8 @@ bool autopilot_route_pi::DeInit(void)
     pConf->Write("BoundaryWidth", p.boundary_width);
 
     // NMEA output
+    pConf->Write("NMEARate", p.rate);
+    pConf->Write("NMEAMagnetic", p.magnetic);
     wxString sentences;
     for(std::map<wxString, bool>::iterator it = p.nmea_sentences.begin();
         it != p.nmea_sentences.end(); it++)
@@ -332,11 +341,13 @@ wxString autopilot_route_pi::StandardPath()
 
 double autopilot_route_pi::Declination()
 {
-    if(!m_declinationTime.IsValid() || (wxDateTime::Now() - m_declinationTime).GetSeconds() > 1200) {
+    if(prefs.magnetic &&
+       (!m_declinationTime.IsValid() || (wxDateTime::Now() - m_declinationTime).GetSeconds() > 1200)) {
         wxJSONWriter w;
         wxString out;
         wxJSONValue v;
         w.Write(v, out);
+        m_declination = NAN;
         SendPluginMessage(wxString(_T("WMM_VARIATION_BOAT_REQUEST")), out);
     }
     return m_declination;
@@ -346,8 +357,6 @@ bool autopilot_route_pi::GetConsoleInfo(double &sog, double &cog,
                                         double &bearing, double &xte,
                                         double *rng, double *nrng)
 {
-    if(m_current_wp.GUID.IsEmpty())
-        return false;
     sog = m_lastfix.Sog;
     cog = m_lastfix.Cog;
     bearing = m_current_bearing;
@@ -551,7 +560,7 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                     lat0 = lat, lon0 = lon;
                 }
                     
-                m_Timer.Start(1000);
+                m_Timer.Start(1000/prefs.rate);
             }
         }
     }
@@ -615,6 +624,7 @@ void autopilot_route_pi::UpdateWaypoint()
         UpdateWaypoint();
     }
 
+    m_next_route_wp_GUID = m_current_wp.GUID; // for total calculations
     if(m_last_wpt_activated_guid != m_current_wp.GUID) {
         wxJSONWriter w;
         wxJSONValue v;
@@ -670,7 +680,9 @@ void autopilot_route_pi::ComputeWaypointBearing()
 
 void autopilot_route_pi::ComputeRoutePositionBearing()
 {
-    double dist = 100;
+    double dist = prefs.route_position_bearing_mode == preferences::TIME ?
+        prefs.route_position_bearing_time*m_avg_sog/3600.0 :
+        prefs.route_position_bearing_distance;
     wp boat(m_lastfix.Lat, m_lastfix.Lon);
     // find optimal position
     bool havew = false;
@@ -690,12 +702,13 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
         p0 = *it;
         double best_dist = INFINITY;
         for(it++; it!=m_route.end(); it++) {
-            wp p1 = *it;
+            waypoint p1 = *it;
             wp x = computation::closest_seg(boat, p0, p1);
             double dist = computation::distance(boat, x);
             if(dist < best_dist) {
                 best_dist = dist;
                 w = x;
+                m_next_route_wp_GUID = p1.GUID; // for total calculations
             }
             p0 = p1;
         }
@@ -708,6 +721,11 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
 
     ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
     m_current_xte = 0;
+}
+
+void autopilot_route_pi::MagneticHeading(double &val)
+{
+    val = heading_resolve(val+m_declination, 180);
 }
 
 NMEA0183    NMEA0183;
@@ -797,36 +815,29 @@ void autopilot_route_pi::SendAPB()
     NMEA0183.Apb.IsPerpendicular = NFalse;
     NMEA0183.Apb.To = m_current_wp.name.Truncate( 6 );
 
-#if 0
-    if( g_bMagneticAPB && !wxIsNaN(gVar) ) {
-        double brg1m = ((brg1 - gVar) >= 0.) ? (brg1 - gVar) : (brg1 - gVar + 360.);
-        double bapm = ((CurrentBrgToActivePoint - gVar) >= 0.) ? (CurrentBrgToActivePoint - gVar) : (CurrentBrgToActivePoint - gVar + 360.);
-        NMEA0183.Apb.BearingOriginToDestination = brg1m;
-        NMEA0183.Apb.BearingOriginToDestinationUnits = _T("M");
-                
-        NMEA0183.Apb.BearingPresentPositionToDestination = bapm;
-        NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("M");
-                
-        NMEA0183.Apb.HeadingToSteer = bapm;
-        NMEA0183.Apb.HeadingToSteerUnits = _T("M");
-    } else
-#endif
-    {
-        NMEA0183.Apb.BearingOriginToDestination = m_current_wp.arrival_bearing;
-        NMEA0183.Apb.BearingOriginToDestinationUnits = _T("T");
+    NMEA0183.Apb.BearingOriginToDestination = m_current_wp.arrival_bearing;
 
-        double brg;
-        ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &brg, 0);
-        NMEA0183.Apb.BearingPresentPositionToDestination = brg;
-        NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("T");
+    double brg;
+    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &brg, 0);
+    NMEA0183.Apb.BearingPresentPositionToDestination = brg;
             
-
-        NMEA0183.Apb.HeadingToSteer = m_current_bearing;
+    NMEA0183.Apb.HeadingToSteer = m_current_bearing;
+    if( prefs.magnetic && !wxIsNaN(m_declination) ) {
+        NMEA0183.Apb.BearingOriginToDestinationUnits = _T("M");
+        NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("M");
+        NMEA0183.Apb.HeadingToSteerUnits = _T("M");
+        
+        MagneticHeading(NMEA0183.Apb.BearingOriginToDestination);
+        MagneticHeading(NMEA0183.Apb.BearingPresentPositionToDestination);
+        MagneticHeading(NMEA0183.Apb.HeadingToSteer);
+    } else {
+        NMEA0183.Apb.BearingOriginToDestinationUnits = _T("T");
+        NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("T");
         NMEA0183.Apb.HeadingToSteerUnits = _T("T");
     }
     SENTENCE snt;
     NMEA0183.Apb.Write( snt );
-    PushNMEABuffer( snt.Sentence  );
+    PushNMEABuffer( snt.Sentence );
 }
 
 void autopilot_route_pi::SendXTE()

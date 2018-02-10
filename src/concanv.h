@@ -132,6 +132,8 @@ public:
       AnnunText         *pTTG;
       AnnunText         *pVMG;
       AnnunText         *pETA;
+      AnnunText         *pTRNG;
+      AnnunText         *pTTTG;
       CDI               *pCDI;
 
       wxFont            *pThisLegFont;
@@ -139,10 +141,10 @@ public:
       wxBrush           *pbackBrush;
 
       autopilot_route_pi &m_pi;
+      int page;
 private:
       void OnPaint(wxPaintEvent& event);
       void OnShow(wxShowEvent& event);
-
 
 DECLARE_EVENT_TABLE()
 };

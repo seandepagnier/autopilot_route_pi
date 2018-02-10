@@ -43,9 +43,13 @@ bool PreferencesDialog::Show( bool show )
         m_sRoutePositionBearingTime->SetValue(p.route_position_bearing_time);
     
         // Active Route Window
-        for(unsigned int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
-            if(p.active_route_labels.find(m_cbActiveRouteItems->GetString(i)) != p.active_route_labels.end())
-                m_cbActiveRouteItems->Check(i, p.active_route_labels[m_cbActiveRouteItems->GetString(i)]);
+        wxCheckListBox *cbActiveRouteItems[2] = {m_cbActiveRouteItems0, m_cbActiveRouteItems1};
+        for(unsigned int ind = 0; ind < 2; ind++)
+            for(unsigned int i=0; i<cbActiveRouteItems[ind]->GetCount(); i++)
+                if(p.active_route_labels[ind].find(cbActiveRouteItems[ind]->GetString(i))
+                   != p.active_route_labels[ind].end())
+                    cbActiveRouteItems[ind]->Check
+                        (i, p.active_route_labels[ind][cbActiveRouteItems[ind]->GetString(i)]);
 
         // Waypoint Arrival
         m_cbConfirmBearingChange->SetValue(p.confirm_bearing_change);
@@ -55,6 +59,15 @@ bool PreferencesDialog::Show( bool show )
         m_sBoundaryWidth->SetValue(p.boundary_width);
 
         // NMEA output
+        long l;
+        m_cRate->SetSelection(0);
+        for(unsigned int i=0; i<m_cRate->GetCount(); i++)
+            if(m_cRate->GetString(i).ToLong(&l) && l == p.rate) {
+                m_cRate->SetSelection(i);
+                break;
+            }
+
+        m_cbMagnetic->SetValue(p.magnetic);
         for(unsigned int i=0; i<m_cbNMEASentences->GetCount(); i++)
             if(p.nmea_sentences.find(m_cbNMEASentences->GetString(i)) != p.nmea_sentences.end())
                 m_cbNMEASentences->Check(i, p.nmea_sentences[m_cbNMEASentences->GetString(i)]);
@@ -98,8 +111,11 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.route_position_bearing_time = m_sRoutePositionBearingTime->GetValue();
     
     // Active Route Window
-    for(unsigned int i=0; i<m_cbActiveRouteItems->GetCount(); i++)
-        p.active_route_labels[m_cbActiveRouteItems->GetString(i)] = m_cbActiveRouteItems->IsChecked(i);
+    wxCheckListBox *cbActiveRouteItems[2] = {m_cbActiveRouteItems0, m_cbActiveRouteItems1};
+    for(unsigned int ind = 0; ind < 2; ind++)
+        for(unsigned int i=0; i<cbActiveRouteItems[ind]->GetCount(); i++)
+            p.active_route_labels[ind][cbActiveRouteItems[ind]->GetString(i)]
+                = cbActiveRouteItems[ind]->IsChecked(i);
 
     // Waypoint Arrival
     p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
@@ -109,6 +125,10 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.boundary_width = m_sBoundaryWidth->GetValue();
 
     // NMEA output
+    long l;
+    if(m_cRate->GetStringSelection().ToLong(&l))
+        p.rate = l;
+    p.magnetic = m_cbMagnetic->GetValue();
     for(unsigned int i=0; i<m_cbNMEASentences->GetCount(); i++)
         p.nmea_sentences[m_cbNMEASentences->GetString(i)] = m_cbNMEASentences->IsChecked(i);
 

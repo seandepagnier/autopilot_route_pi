@@ -23,9 +23,10 @@
 #include <wx/choicebk.h>
 #include <wx/statbox.h>
 #include <wx/checklst.h>
+#include <wx/choice.h>
+#include <wx/checkbox.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
-#include <wx/checkbox.h>
 #include <wx/dialog.h>
 
 #include "wxWTranslateCatalog.h"
@@ -62,9 +63,11 @@ class PreferencesDialogBase : public wxDialog
 		wxPanel* m_panel10;
 		wxSpinCtrl* m_sRoutePositionBearingTime;
 		wxStaticText* m_staticText30;
-		wxCheckListBox* m_cbActiveRouteItems;
-		wxStaticText* m_staticText12;
-		wxTextCtrl* m_tTalkerID;
+		wxCheckListBox* m_cbActiveRouteItems0;
+		wxCheckListBox* m_cbActiveRouteItems1;
+		wxChoice* m_cRate;
+		wxStaticText* m_staticText13;
+		wxCheckBox* m_cbMagnetic;
 		wxCheckListBox* m_cbNMEASentences;
 		wxStaticText* m_staticText29;
 		wxTextCtrl* m_tBoundary;

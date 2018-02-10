@@ -40,6 +40,7 @@
 #include "wx/datetime.h"
 
 #include "concanv.h"
+#include "georef.h"
 
 #if 0
 extern bool             g_bShowActiveRouteHighway;
@@ -71,6 +72,7 @@ END_EVENT_TABLE()
 ConsoleCanvas::ConsoleCanvas( wxWindow *frame, autopilot_route_pi &pi )
 : m_pi(pi)
 {
+    page = 0;
     pbackBrush = NULL;
     m_bNeedClear = false;
 
@@ -97,13 +99,21 @@ ConsoleCanvas::ConsoleCanvas( wxWindow *frame, autopilot_route_pi &pi )
     pRNG->SetALabel( _T("RNG") );
     m_pitemBoxSizerLeg->Add( pRNG, 1, wxALIGN_LEFT | wxALL, 2 );
 
+    pTRNG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
+    pTRNG->SetALabel( _T("Route RNG") );
+    m_pitemBoxSizerLeg->Add( pTRNG, 1, wxALIGN_LEFT | wxALL, 2 );
+
     pVMG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
     pVMG->SetALabel( _T("VMG") );
     m_pitemBoxSizerLeg->Add( pVMG, 1, wxALIGN_LEFT | wxALL, 2 );
 
     pETA = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
-    pETA->SetALabel( _T("ETA") );
+    pETA->SetALabel( _T("Route ETA") );
     m_pitemBoxSizerLeg->Add( pETA, 1, wxALIGN_LEFT | wxALL, 2 );
+
+    pTTTG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
+    pTTTG->SetALabel( _T("Route TTG") );
+    m_pitemBoxSizerLeg->Add( pTTTG, 1, wxALIGN_LEFT | wxALL, 2 );
 
     pTTG = new AnnunText( this, -1, _("Console Legend"), _("Console Value") );
     pTTG->SetALabel( _T("TTG") );
@@ -153,7 +163,8 @@ void ConsoleCanvas::SetColorScheme( PI_ColorScheme cs )
     pTTG->SetColorScheme( cs );
     pVMG->SetColorScheme( cs );
     pETA->SetColorScheme( cs );
-
+    pTRNG->SetColorScheme( cs );
+    pTTTG->SetColorScheme( cs );
     pCDI->SetColorScheme( cs );
 }
 
@@ -175,13 +186,15 @@ void ConsoleCanvas::OnPaint( wxPaintEvent& event )
 
 void ConsoleCanvas::OnShow( wxShowEvent& event )
 {
-    pXTE->Show( m_pi.prefs.ActiveRouteLabel("XTE") );
-    pBRG->Show( m_pi.prefs.ActiveRouteLabel("BRG") );
-    pRNG->Show( m_pi.prefs.ActiveRouteLabel("RNG") );
-    pTTG->Show( m_pi.prefs.ActiveRouteLabel("TTG") );
-    pVMG->Show( m_pi.prefs.ActiveRouteLabel("VMG") );
-    pETA->Show( m_pi.prefs.ActiveRouteLabel("ETA") );
-    pCDI->Show( m_pi.prefs.ActiveRouteLabel("Highway") );
+    pXTE->Show( m_pi.prefs.ActiveRouteLabel(page, "XTE") );
+    pBRG->Show( m_pi.prefs.ActiveRouteLabel(page, "BRG") );
+    pRNG->Show( m_pi.prefs.ActiveRouteLabel(page, "RNG") );
+    pTTG->Show( m_pi.prefs.ActiveRouteLabel(page, "TTG") );
+    pVMG->Show( m_pi.prefs.ActiveRouteLabel(page, "VMG") );
+    pETA->Show( m_pi.prefs.ActiveRouteLabel(page, "Route ETA") );
+    pTRNG->Show(m_pi.prefs.ActiveRouteLabel(page, "Route RNG") );
+    pTTTG->Show(m_pi.prefs.ActiveRouteLabel(page, "Route TTG") );
+    pCDI->Show( m_pi.prefs.ActiveRouteLabel(page, "Highway") );
 
     m_pitemBoxSizerLeg->SetSizeHints( this );
 }
@@ -258,9 +271,9 @@ void ConsoleCanvas::UpdateRouteData()
     str_buf.Printf( _T("%6.2f"), toUsrDistance_Plugin( fabs(xte) ));
     pXTE->SetAValue( str_buf );
     if( xte < 0 )
-        pXTE->SetALabel( wxString( _("XTE         L") ) );
+        pXTE->SetALabel( "XTE         L" );
     else
-        pXTE->SetALabel( wxString( _("XTE         R") ) );
+        pXTE->SetALabel( "XTE         R" );
     
     // TTG
     // In all cases, ttg/eta are declared invalid if VMG <= 0.
@@ -274,76 +287,68 @@ void ConsoleCanvas::UpdateRouteData()
         ttg_s = _T("---");
     
     pTTG->SetAValue( ttg_s );
-#if 0
-    {
-                //    Remainder of route
-                float trng = rng;
 
-                Route *prt = g_pRouteMan->GetpActiveRoute();
-                wxRoutePointListNode *node = ( prt->pRoutePointList )->GetFirst();
-                RoutePoint *prp;
+    //    Remainder of route
+    float trng = rng;
 
-                int n_addflag = 0;
-                while( node )
-                {
-                    prp = node->GetData();
-                    if( n_addflag )
-                        trng += prp->m_seg_len;
+    ap_route &rt = m_pi.m_route;
+    int n_addflag = 0;
+    double lat0, lon0;
+    for(ap_route_iterator it = rt.begin(); it != rt.end(); it++) {
+        waypoint &wp = *it;
+        if( n_addflag ) {
+            double dist;
+            ll_gc_ll_reverse(lat0, lon0, wp.lat, wp.lon, 0, &dist);
+            trng += dist;
+        }
+        lat0 = wp.lat, lon0 = wp.lon;
 
-                    if( prp == prt->m_pRouteActivePoint )
-                        n_addflag++;
-
-                    node = node->GetNext();
-                }
+        if( wp.GUID == m_pi.m_next_route_wp_GUID)
+            n_addflag=1;
+    }
 
     //                total rng
-                wxString strng;
-                if( trng < 10.0 )
-                    strng.Printf( _T("%6.2f"), toUsrDistance_Plugin( trng ) );
-                else
-                    strng.Printf( _T("%6.1f"), toUsrDistance_Plugin( trng ) );
+    wxString strng;
+    if( trng < 10.0 )
+        strng.Printf( _T("%6.2f"), toUsrDistance_Plugin( trng ) );
+    else
+        strng.Printf( _T("%6.1f"), toUsrDistance_Plugin( trng ) );
 
-                pRNG->SetAValue( strng );
+    pTRNG->SetAValue( strng );
 
-                // total TTG
-                // If showing total route TTG/ETA, use gSog for calculation
+    // total TTG
+    // If showing total route TTG/ETA, use gSog for calculation
 
-                wxString tttg_s;
-                wxTimeSpan tttg_span;
-                float tttg_sec;
-                if( VMG > 0. )
-                {
-                    tttg_sec = ( trng / gSog ) * 3600.;
-                    tttg_span = wxTimeSpan::Seconds( (long) tttg_sec );
-                    //Show also #days if TTG > 24 h
-                    tttg_s = tttg_sec > SECONDS_PER_DAY ? 
-                      tttg_span.Format(_("%Dd %H:%M")) : tttg_span.Format("%H:%M:%S");
-                }
-                else
-                {
-                    tttg_span = wxTimeSpan::Seconds( 0 );
-                    tttg_s = _T("---");
-                }
+    wxString tttg_s;
+    wxTimeSpan tttg_span;
+    float tttg_sec;
+    if( VMG > 0. ) {
+        tttg_sec = ( trng / sog ) * 3600.;
+        tttg_span = wxTimeSpan::Seconds( (long) tttg_sec );
+        //Show also #days if TTG > 24 h
+        tttg_s = tttg_sec > SECONDS_PER_DAY ? 
+            tttg_span.Format(_("%Dd %H:%M")) : tttg_span.Format("%H:%M:%S");
+    } else {
+        tttg_span = wxTimeSpan::Seconds( 0 );
+        tttg_s = _T("---");
+    }
 
-                pTTG->SetAValue( tttg_s );
+    pTTTG->SetAValue( tttg_s );
 
     //                total ETA to be shown on XTE panel
-                wxDateTime dtnow, eta;
-                dtnow.SetToCurrent();
-                eta = dtnow.Add( tttg_span );
-                wxString seta;
+    wxDateTime dtnow, eta;
+    dtnow.SetToCurrent();
+    eta = dtnow.Add( tttg_span );
+    wxString seta;
 
-                if (VMG > 0.) {
-                  // Show date, e.g. Feb 15, if TTG > 24 h
-                  seta = tttg_sec > SECONDS_PER_DAY ?
-                    eta.Format(_T("%b %d %H:%M")) : eta.Format(_T("%H:%M"));
-                } else {
-                  seta = _T("---");
-                }
-                pXTE->SetAValue( seta );
-                pXTE->SetALabel( wxString( _("ETA          ") ) );
-            }
-#endif
+    if (VMG > 0.) {
+        // Show date, e.g. Feb 15, if TTG > 24 h
+        seta = tttg_sec > SECONDS_PER_DAY ?
+            eta.Format(_T("%b %d %H:%M")) : eta.Format(_T("%H:%M"));
+    } else {
+        seta = _T("---");
+    }
+    pETA->SetAValue( seta );
 
     pXTE->Refresh();
     pBRG->Refresh();
@@ -351,6 +356,8 @@ void ConsoleCanvas::UpdateRouteData()
     pTTG->Refresh();
     pVMG->Refresh();
     pETA->Refresh();
+    pTRNG->Refresh();
+    pTTTG->Refresh();
     pCDI->Refresh();
 }
 
@@ -372,6 +379,8 @@ void ConsoleCanvas::UpdateFonts( void )
     pTTG->RefreshFonts();
     pVMG->RefreshFonts();
     pETA->RefreshFonts();
+    pTRNG->RefreshFonts();
+    pTTTG->RefreshFonts();
 
     m_pitemBoxSizerLeg->SetSizeHints( this );
     Layout();
@@ -421,7 +430,8 @@ void AnnunText::MouseEvent( wxMouseEvent& event )
     else if( event.LeftDown() ) {
         ConsoleCanvas *ccp = dynamic_cast<ConsoleCanvas*>(GetParent());
         if(ccp){
-            //ccp->ToggleRouteTotalDisplay();
+            ccp->page = !ccp->page;
+            ccp->ShowWithFreshFonts();
         }
     }
     

@@ -27,7 +27,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer37->SetFlexibleDirection( wxBOTH );
 	fgSizer37->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_cbMode = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
+	m_cbMode = new wxChoicebook( this, wxID_ANY, wxDefaultPosition, wxSize( 200,-1 ), wxCHB_DEFAULT );
 	m_panel5 = new wxPanel( m_cbMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer44;
 	fgSizer44 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -153,7 +153,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer8->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer5;
-	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Active Route Window") ), wxVERTICAL );
+	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Active Route Windows") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer16;
 	fgSizer16 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -161,18 +161,15 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer16->SetFlexibleDirection( wxBOTH );
 	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	wxFlexGridSizer* fgSizer17;
-	fgSizer17 = new wxFlexGridSizer( 0, 1, 0, 0 );
-	fgSizer17->SetFlexibleDirection( wxBOTH );
-	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxString m_cbActiveRouteItems0Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway") };
+	int m_cbActiveRouteItems0NChoices = sizeof( m_cbActiveRouteItems0Choices ) / sizeof( wxString );
+	m_cbActiveRouteItems0 = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
+	fgSizer16->Add( m_cbActiveRouteItems0, 0, wxALL|wxEXPAND, 5 );
 	
-	
-	fgSizer16->Add( fgSizer17, 1, wxEXPAND, 5 );
-	
-	wxString m_cbActiveRouteItemsChoices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("ETA"), _("Highway") };
-	int m_cbActiveRouteItemsNChoices = sizeof( m_cbActiveRouteItemsChoices ) / sizeof( wxString );
-	m_cbActiveRouteItems = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItemsNChoices, m_cbActiveRouteItemsChoices, 0 );
-	fgSizer16->Add( m_cbActiveRouteItems, 0, wxALL|wxEXPAND, 5 );
+	wxString m_cbActiveRouteItems1Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway") };
+	int m_cbActiveRouteItems1NChoices = sizeof( m_cbActiveRouteItems1Choices ) / sizeof( wxString );
+	m_cbActiveRouteItems1 = new wxCheckListBox( this, wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
+	fgSizer16->Add( m_cbActiveRouteItems1, 0, wxALL, 5 );
 	
 	
 	sbSizer5->Add( fgSizer16, 1, wxEXPAND, 5 );
@@ -189,20 +186,34 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer161->SetFlexibleDirection( wxBOTH );
 	fgSizer161->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
+	wxFlexGridSizer* fgSizer17;
+	fgSizer17 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer17->SetFlexibleDirection( wxBOTH );
+	fgSizer17->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
 	wxFlexGridSizer* fgSizer171;
-	fgSizer171 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer171 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer171->SetFlexibleDirection( wxBOTH );
 	fgSizer171->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_staticText12 = new wxStaticText( this, wxID_ANY, _("Talker ID"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText12->Wrap( -1 );
-	fgSizer171->Add( m_staticText12, 0, wxALL, 5 );
+	wxString m_cRateChoices[] = { _("1"), _("2"), _("5"), _("10") };
+	int m_cRateNChoices = sizeof( m_cRateChoices ) / sizeof( wxString );
+	m_cRate = new wxChoice( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cRateNChoices, m_cRateChoices, 0 );
+	m_cRate->SetSelection( 0 );
+	fgSizer171->Add( m_cRate, 0, wxALL, 5 );
 	
-	m_tTalkerID = new wxTextCtrl( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer171->Add( m_tTalkerID, 0, wxALL, 5 );
+	m_staticText13 = new wxStaticText( this, wxID_ANY, _("hz"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText13->Wrap( -1 );
+	fgSizer171->Add( m_staticText13, 0, wxALL, 5 );
 	
 	
-	fgSizer161->Add( fgSizer171, 1, wxEXPAND, 5 );
+	fgSizer17->Add( fgSizer171, 1, wxEXPAND, 5 );
+	
+	m_cbMagnetic = new wxCheckBox( this, wxID_ANY, _("Magnetic"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer17->Add( m_cbMagnetic, 0, wxALL, 5 );
+	
+	
+	fgSizer161->Add( fgSizer17, 1, wxEXPAND, 5 );
 	
 	wxString m_cbNMEASentencesChoices[] = { _("RMB"), _("RMC"), _("APB"), _("XTE") };
 	int m_cbNMEASentencesNChoices = sizeof( m_cbNMEASentencesChoices ) / sizeof( wxString );
