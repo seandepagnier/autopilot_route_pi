@@ -182,6 +182,7 @@ private:
 
     void RearrangeWindow();
 
+    void RequestRoute(wxString guid);
     void AdvanceWaypoint();
     void UpdateWaypoint();
     double FindXTE();
@@ -209,6 +210,7 @@ private:
     PI_ColorScheme m_colorscheme;
 
     wxString m_active_guid, m_active_request_guid;
+    wxDateTime m_active_request_time;
     ap_route m_route;
 
     waypoint m_current_wp;

@@ -441,6 +441,10 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
 {
     if(m_active_guid.IsEmpty())
         return;
+
+    // for now poll active route (not efficient)
+    if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10)
+        RequestRoute(m_active_guid);
     
     switch(prefs.mode) {
     case preferences::STANDARD_XTE:     ComputeXTE();             break;
@@ -496,6 +500,7 @@ static bool ParseMessage(wxString &message_body, wxJSONValue &root)
     return false;
 }
 
+
 void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
     // construct the JSON root object
@@ -504,7 +509,7 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
     wxString    out;
     
     if(message_id == wxS("AUTOPILOT_ROUTE_PI")) {
-        return;
+        return; // nothing yet
     } else if(message_id == wxS("AIS")) {
     } else if(message_id == _T("WMM_VARIATION_BOAT")) {
         if(ParseMessage( message_body, root )) {
@@ -514,14 +519,8 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
     } else if(message_id == "OCPN_RTE_ACTIVATED") {
         if(ParseMessage( message_body, root )) {
             m_current_wp.GUID = "";
-            m_active_request_guid = root[_T("GUID")].AsString();
             // when route is activated, request the route
-            wxJSONWriter w;
-            wxJSONValue v;
-            v["GUID"] = m_active_request_guid;
-            w.Write(v, out);
-            SendPluginMessage("OCPN_ROUTE_REQUEST", out);
-
+            RequestRoute(root[_T("GUID")].AsString());
             ShowConsoleCanvas();
         }
     } else if(message_id == "OCPN_WPT_ACTIVATED") {
@@ -542,11 +541,12 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 return;
             wxString guid = root["GUID"].AsString();
             if(guid == m_active_request_guid) {
+                m_active_request_time = wxDateTime::Now();
+                
                 m_active_guid = guid;
-                m_active_request_guid = "";
                 wxJSONValue w = root["waypoints"];
                 int size = w.Size();
-                m_route.clear();
+                m_route.clear;
                 double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
                 for(int i=0; i<size; i++) {
                     double lat = w[i]["lat"].AsDouble(), lon = w[i]["lon"].AsDouble();
@@ -559,6 +559,8 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                     m_route.push_back(wp);
                     lat0 = lat, lon0 = lon;
                 }
+
+                m_current_wp.GUID = "";
                     
                 m_Timer.Start(1000/prefs.rate);
             }
@@ -569,6 +571,17 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
 void autopilot_route_pi::RearrangeWindow()
 {
     SetColorScheme(PI_ColorScheme());
+}
+
+void autopilot_route_pi::RequestRoute(wxString guid)
+{
+    wxJSONWriter w;
+    wxJSONValue v;
+    v["GUID"] = guid;
+    wxString out;
+    w.Write(v, out);
+    m_active_request_guid = guid;
+    SendPluginMessage("OCPN_ROUTE_REQUEST", out);
 }
 
 void autopilot_route_pi::AdvanceWaypoint()
