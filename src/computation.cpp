@@ -28,6 +28,10 @@
 #include "computation.h"
 // spherical computations
 
+#ifndef M_PI
+      #define M_PI        3.1415926535897931160E0      /* pi */
+#endif
+
 namespace computation
 {
 

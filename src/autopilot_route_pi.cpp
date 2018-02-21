@@ -122,7 +122,7 @@ int autopilot_route_pi::Init(void)
     }
 
     // Waypoint Arrival
-    p.confirm_bearing_change = pConf->Read("ConfirmBearingChange", 0L);
+    p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
 
     // Boundary
     p.boundary_guid = pConf->Read("Boundary", "");
@@ -130,7 +130,7 @@ int autopilot_route_pi::Init(void)
 
     // NMEA output
     p.rate = pConf->Read("NMEARate", 1L);
-    p.magnetic = pConf->Read("NMEAMagnetic", 0L);
+    p.magnetic = (bool)pConf->Read("NMEAMagnetic", 0L);
     wxString sentences = pConf->Read("NMEASentences", "APB;");
     while(sentences.size()) {
         p.nmea_sentences[sentences.BeforeFirst(';')] = true;
@@ -546,7 +546,7 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 m_active_guid = guid;
                 wxJSONValue w = root["waypoints"];
                 int size = w.Size();
-                m_route.clear;
+                m_route.clear();
                 double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
                 for(int i=0; i<size; i++) {
                     double lat = w[i]["lat"].AsDouble(), lon = w[i]["lon"].AsDouble();
