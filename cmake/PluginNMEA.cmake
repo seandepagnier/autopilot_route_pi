@@ -16,6 +16,9 @@ SET(SRC_NMEA0183
     src/nmea0183/hexvalue.cpp
     src/nmea0183/lat.cpp
     src/nmea0183/expid.cpp
+    src/nmea0183/apb.cpp
+    src/nmea0183/xte.cpp
+    src/nmea0183/GPwpl.cpp
     src/nmea0183/wpl.cpp
     src/nmea0183/rte.cpp
     src/nmea0183/hdt.cpp
