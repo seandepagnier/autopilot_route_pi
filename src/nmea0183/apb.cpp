@@ -40,7 +40,7 @@
 ** You can use it any way you like.
 */
 
-extern int              g_NMEAAPBPrecision;
+//extern int              g_NMEAAPBPrecision;
 
 
 APB::APB()
@@ -150,7 +150,7 @@ bool APB::Write( SENTENCE& sentence )
 
    sentence += IsLoranBlinkOK;
    sentence += IsLoranCCycleLockOK;
-   sentence.Add( CrossTrackErrorMagnitude, g_NMEAAPBPrecision);
+   sentence.Add( CrossTrackErrorMagnitude, 1);
 
    if(DirectionToSteer == Left)
        sentence += _T("L");
@@ -160,12 +160,12 @@ bool APB::Write( SENTENCE& sentence )
    sentence += CrossTrackUnits;
    sentence += IsArrivalCircleEntered;
    sentence += IsPerpendicular;
-   sentence.Add( BearingOriginToDestination, g_NMEAAPBPrecision);
+   sentence.Add( BearingOriginToDestination, 1);
    sentence += BearingOriginToDestinationUnits;
    sentence += To;
-   sentence.Add( BearingPresentPositionToDestination, g_NMEAAPBPrecision );
+   sentence.Add( BearingPresentPositionToDestination, 1 );
    sentence += BearingPresentPositionToDestinationUnits;
-   sentence.Add( HeadingToSteer, g_NMEAAPBPrecision );
+   sentence.Add( HeadingToSteer, 1 );
    sentence += HeadingToSteerUnits;
 
    sentence.Finish();

@@ -103,9 +103,9 @@ int autopilot_route_pi::Init(void)
 
     // Mode
     p.mode = (preferences::Mode)pConf->Read("Mode", 0L);
-    p.xte_multiplier = pConf->Read("XTEP", 1L);
-    p.xte_rate_multiplier = pConf->Read("XTED", 0L);
-    p.xte_boundary_multiplier = pConf->Read("XTEBoundaryP", 1L);
+    p.xte_multiplier = pConf->Read("XTEP", 1.0);
+    p.xte_rate_multiplier = pConf->Read("XTED", 0.0);
+    p.xte_boundary_multiplier = pConf->Read("XTEBoundaryP", 1.0);
     p.route_position_bearing_mode = (preferences::RoutePositionBearingMode)
         pConf->Read("RoutePositionBearingMode", 0L);
     p.route_position_bearing_distance = pConf->Read("RoutePositionBearingDistance", 100);
