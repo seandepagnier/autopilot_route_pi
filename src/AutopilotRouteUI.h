@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Dec  3 2017)
+// C++ code generated with wxFormBuilder (version Feb 20 2018)
 // http://www.wxformbuilder.org/
 //
-// PLEASE DO "NOT" EDIT THIS FILE!
+// PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
 #ifndef __AUTOPILOTROUTEUI_H__
@@ -50,10 +50,6 @@ class PreferencesDialogBase : public wxDialog
 		wxStaticText* m_staticText571;
 		wxSpinCtrl* m_sXTED;
 		wxStaticText* m_staticText56;
-		wxPanel* m_panel7;
-		wxStaticText* m_staticText70;
-		wxSpinCtrl* m_sXTEBoundaryP;
-		wxStaticText* m_staticText20;
 		wxPanel* m_panel8;
 		wxPanel* m_panel9;
 		wxChoicebook* m_cbRoutePositionBearingMode;
@@ -69,7 +65,7 @@ class PreferencesDialogBase : public wxDialog
 		wxStaticText* m_staticText13;
 		wxCheckBox* m_cbMagnetic;
 		wxCheckListBox* m_cbNMEASentences;
-		wxStaticText* m_staticText29;
+		wxCheckBox* m_cbBoundary;
 		wxTextCtrl* m_tBoundary;
 		wxButton* m_button22;
 		wxStaticText* m_staticText71;

@@ -102,10 +102,9 @@ int autopilot_route_pi::Init(void)
     preferences &p = prefs;
 
     // Mode
-    p.mode = (preferences::Mode)pConf->Read("Mode", 0L);
+    p.mode = pConf->Read("Mode", "");
     p.xte_multiplier = pConf->Read("XTEP", 1.0);
     p.xte_rate_multiplier = pConf->Read("XTED", 0.0);
-    p.xte_boundary_multiplier = pConf->Read("XTEBoundaryP", 1.0);
     p.route_position_bearing_mode = (preferences::RoutePositionBearingMode)
         pConf->Read("RoutePositionBearingMode", 0L);
     p.route_position_bearing_distance = pConf->Read("RoutePositionBearingDistance", 100);
@@ -153,11 +152,11 @@ int autopilot_route_pi::Init(void)
 }
 
 bool autopilot_route_pi::DeInit(void)
-{
+{    
     PlugInHandleAutopilotRoute(false);
     delete m_PreferencesDialog;
     delete m_ConsoleCanvas;
-    
+   
     m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( autopilot_route_pi::OnTimer ), NULL, this);
     
     RemovePlugInTool(m_leftclick_tool_id);
@@ -168,10 +167,9 @@ bool autopilot_route_pi::DeInit(void)
     preferences &p = prefs;
 
     // Mode
-    pConf->Write("Mode", (int)p.mode);
+    pConf->Write("Mode", p.mode);
     pConf->Write("XTEP", p.xte_multiplier);
     pConf->Write("XTED", p.xte_rate_multiplier);
-    pConf->Write("XTEBoundaryP", p.xte_boundary_multiplier);
     pConf->Write("RoutePositionBearingMode", (int)p.route_position_bearing_mode);
     pConf->Write("RoutePositionBearingDistance", p.route_position_bearing_distance);
     pConf->Write("RoutePositionBearingTime", p.route_position_bearing_time);
@@ -391,7 +389,7 @@ void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
     if(m_active_guid.IsEmpty())
         return;
     
-    if(prefs.mode != preferences::ROUTE_POSITION_BEARING)
+    if(prefs.mode != "Route Position Bearing")
         RenderArrivalWaypoint(dc, vp);
     else
         RenderRoutePositionBearing(dc, vp);
@@ -446,12 +444,10 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
     if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10)
         RequestRoute(m_active_guid);
     
-    switch(prefs.mode) {
-    case preferences::STANDARD_XTE:     ComputeXTE();             break;
-    case preferences::BOUNDARY_XTE:     ComputeBoundaryXTE();     break;
-    case preferences::WAYPOINT_BEARING: ComputeWaypointBearing(); break;
-    case preferences::ROUTE_POSITION_BEARING:  ComputeRoutePositionBearing();   break;
-    }
+    if(prefs.mode == "Standard XTE") ComputeXTE(); else
+    if(prefs.mode == "Waypoint Bearing") ComputeWaypointBearing(); else
+    if(prefs.mode == "Route Position Bearing") ComputeRoutePositionBearing(); else
+        prefs.mode = "Standard XTE";
 
     m_ConsoleCanvas->UpdateRouteData();
     SendNMEA();
@@ -673,16 +669,6 @@ void autopilot_route_pi::ComputeXTE()
     m_current_xte = xte*prefs.xte_multiplier + m_xte_rate*prefs.xte_rate_multiplier;
 }
 
-void autopilot_route_pi::ComputeBoundaryXTE()
-{
-    UpdateWaypoint();
-    double xte = FindXTE();
-
-    // find distance to edge of boundary and apply
-    m_current_bearing = m_current_wp.arrival_bearing;
-    m_current_xte = xte*prefs.xte_boundary_multiplier;
-}
-
 void autopilot_route_pi::ComputeWaypointBearing()
 {
     UpdateWaypoint();    
@@ -693,10 +679,27 @@ void autopilot_route_pi::ComputeWaypointBearing()
 
 void autopilot_route_pi::ComputeRoutePositionBearing()
 {
-    double dist = prefs.route_position_bearing_mode == preferences::TIME ?
+    double dist, bearing;
+    // arrival radius only for final route point to deactivate route
+    waypoint &finish = *m_route.rbegin();
+    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, finish.lat, finish.lon,
+                     &bearing, &dist);
+
+    // if in the arrival radius for final route point or heading away, deactivate
+    m_bArrival = dist < finish.arrival_radius;
+    if(m_bArrival ||
+       fabs(heading_resolve(m_current_wp.arrival_bearing - bearing)) > 90) {
+        // reached destination
+        SendPluginMessageEmpty("OCPN_RTE_ENDED");
+        DeactivateRoute();
+    }
+
+    // distance ahead to steer to
+    dist = prefs.route_position_bearing_mode == preferences::TIME ?
         prefs.route_position_bearing_time*m_avg_sog/3600.0 :
         prefs.route_position_bearing_distance;
     wp boat(m_lastfix.Lat, m_lastfix.Lon);
+    
     // find optimal position
     bool havew = false;
     ap_route_iterator it = m_route.begin();

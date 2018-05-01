@@ -34,10 +34,14 @@ bool PreferencesDialog::Show( bool show )
         autopilot_route_pi::preferences &p = m_pi.prefs;
 
         // Mode
-        m_cbMode->SetSelection(p.mode);
+        for(int i=0; i<m_cbMode->GetPageCount(); i++)
+            if(m_cbMode->GetPageText(i) == p.mode) {
+                m_cbMode->SetSelection(i);
+                break;
+            }
+
         m_sXTEP->SetValue(p.xte_multiplier*100);
         m_sXTED->SetValue(p.xte_rate_multiplier*100);
-        m_sXTEBoundaryP->SetValue(p.xte_boundary_multiplier*100);
         m_cbRoutePositionBearingMode->SetSelection(p.route_position_bearing_mode);
         m_sRoutePositionBearingDistance->SetValue(p.route_position_bearing_distance);
         m_sRoutePositionBearingTime->SetValue(p.route_position_bearing_time);
@@ -78,10 +82,6 @@ bool PreferencesDialog::Show( bool show )
 
 void PreferencesDialog::OnMode( wxChoicebookEvent& event )
 {
-    if(m_cbMode->GetSelection() == 0)
-        m_tBoundary->Disable();
-    else
-        m_tBoundary->Enable();
 }
 
 void PreferencesDialog::OnInformation( wxCommandEvent& event )
@@ -101,10 +101,9 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     autopilot_route_pi::preferences &p = m_pi.prefs;
 
     // Mode
-    p.mode = (autopilot_route_pi::preferences::Mode)m_cbMode->GetSelection();
+    p.mode = m_cbMode->GetPageText(m_cbMode->GetSelection());
     p.xte_multiplier = m_sXTEP->GetValue() / 100.0;
     p.xte_rate_multiplier = m_sXTED->GetValue() / 100.0;
-    p.xte_boundary_multiplier = m_sXTEBoundaryP->GetValue() / 100.0;
     p.route_position_bearing_mode = (autopilot_route_pi::preferences::RoutePositionBearingMode)
         m_cbRoutePositionBearingMode->GetSelection();
     p.route_position_bearing_distance = m_sRoutePositionBearingDistance->GetValue();

@@ -121,13 +121,10 @@ public:
 
     // these are stored to the config
     struct preferences {
-        enum Mode {STANDARD_XTE, BOUNDARY_XTE, WAYPOINT_BEARING, ROUTE_POSITION_BEARING} mode;
+        wxString mode;
 
         // Standard XTE
         double xte_multiplier, xte_rate_multiplier;
-
-        // Boundary XTE
-        double xte_boundary_multiplier;
 
         // Waypoint Bearing
 

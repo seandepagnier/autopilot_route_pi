@@ -153,7 +153,7 @@ bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w)
         return false; // spherical circle doesn't intersect great circle
 
     // spherical law of cosines, b is distance from closest position
-    // to where spherical circle intersects p0<->p1
+    // to where s<<<<<<<<<<<<pherical circle intersects p0<->p1
     double b = acos(d/a);
     quaternion q(b, n);
     vector w0 = q.rotate(v), w1 = q.conjugate().rotate(v);
