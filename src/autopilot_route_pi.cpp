@@ -688,7 +688,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     // if in the arrival radius for final route point or heading away, deactivate
     m_bArrival = dist < finish.arrival_radius;
     if(m_bArrival ||
-       fabs(heading_resolve(m_current_wp.arrival_bearing - bearing)) > 90) {
+       (m_current_wp.eq(finish) && fabs(heading_resolve(finish.arrival_bearing - bearing)) > 90)) {
         // reached destination
         SendPluginMessageEmpty("OCPN_RTE_ENDED");
         DeactivateRoute();

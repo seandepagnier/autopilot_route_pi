@@ -28,6 +28,7 @@ struct wp
 {
     wp() {}
     wp(double _lat, double _lon) : lat(_lat), lon(_lon) {}
+    bool eq(wp &w) { return lat == w.lat && lon == w.lon; }
     double lat, lon;
 };
 
