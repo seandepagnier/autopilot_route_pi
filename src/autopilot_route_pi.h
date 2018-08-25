@@ -142,6 +142,8 @@ public:
 
         // Waypoint Arrival
         bool confirm_bearing_change;
+        bool intercept_route;
+        enum ComputationType { GREAT_CIRCLE, MERCATOR } computation;
 
         // Boundary
         wxString boundary_guid;

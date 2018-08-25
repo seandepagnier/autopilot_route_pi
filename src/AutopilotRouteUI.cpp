@@ -16,8 +16,16 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	wxFlexGridSizer* fgSizer8;
 	fgSizer8 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer8->AddGrowableCol( 0 );
+	fgSizer8->AddGrowableCol( 1 );
+	fgSizer8->AddGrowableRow( 0 );
 	fgSizer8->SetFlexibleDirection( wxBOTH );
 	fgSizer8->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_ALL );
+	
+	wxFlexGridSizer* fgSizer162;
+	fgSizer162 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer162->AddGrowableCol( 0 );
+	fgSizer162->SetFlexibleDirection( wxBOTH );
+	fgSizer162->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer7;
 	sbSizer7 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Mode") ), wxVERTICAL );
@@ -96,7 +104,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_panel91->SetSizer( fgSizer19 );
 	m_panel91->Layout();
 	fgSizer19->Fit( m_panel91 );
-	m_cbRoutePositionBearingMode->AddPage( m_panel91, _("By Distance"), false );
+	m_cbRoutePositionBearingMode->AddPage( m_panel91, _("By Distance"), true );
 	m_panel10 = new wxPanel( m_cbRoutePositionBearingMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer20;
 	fgSizer20 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -114,7 +122,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_panel10->SetSizer( fgSizer20 );
 	m_panel10->Layout();
 	fgSizer20->Fit( m_panel10 );
-	m_cbRoutePositionBearingMode->AddPage( m_panel10, _("By Time"), true );
+	m_cbRoutePositionBearingMode->AddPage( m_panel10, _("By Time"), false );
 	fgSizer51->Add( m_cbRoutePositionBearingMode, 1, wxEXPAND | wxALL, 5 );
 	
 	
@@ -128,32 +136,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer7->Add( fgSizer37, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer8->Add( sbSizer7, 1, wxEXPAND, 5 );
-	
-	wxStaticBoxSizer* sbSizer5;
-	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Active Route Windows") ), wxVERTICAL );
-	
-	wxFlexGridSizer* fgSizer16;
-	fgSizer16 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer16->AddGrowableCol( 1 );
-	fgSizer16->SetFlexibleDirection( wxBOTH );
-	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-	
-	wxString m_cbActiveRouteItems0Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway") };
-	int m_cbActiveRouteItems0NChoices = sizeof( m_cbActiveRouteItems0Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
-	fgSizer16->Add( m_cbActiveRouteItems0, 0, wxALL|wxEXPAND, 5 );
-	
-	wxString m_cbActiveRouteItems1Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway") };
-	int m_cbActiveRouteItems1NChoices = sizeof( m_cbActiveRouteItems1Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
-	fgSizer16->Add( m_cbActiveRouteItems1, 0, wxALL, 5 );
-	
-	
-	sbSizer5->Add( fgSizer16, 1, wxEXPAND, 5 );
-	
-	
-	fgSizer8->Add( sbSizer5, 1, wxEXPAND, 5 );
+	fgSizer162->Add( sbSizer7, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer6;
 	sbSizer6 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("NMEA Sentences") ), wxVERTICAL );
@@ -202,7 +185,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer6->Add( fgSizer161, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer8->Add( sbSizer6, 1, wxEXPAND, 5 );
+	fgSizer162->Add( sbSizer6, 1, wxEXPAND, 5 );
 	
 	wxStaticBoxSizer* sbSizer9;
 	sbSizer9 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Boundary") ), wxVERTICAL );
@@ -245,24 +228,67 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	sbSizer9->Add( fgSizer56, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer8->Add( sbSizer9, 1, wxEXPAND, 5 );
+	fgSizer162->Add( sbSizer9, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer8->Add( fgSizer162, 1, wxEXPAND, 5 );
+	
+	wxFlexGridSizer* fgSizer181;
+	fgSizer181 = new wxFlexGridSizer( 0, 1, 0, 0 );
+	fgSizer181->AddGrowableCol( 0 );
+	fgSizer181->SetFlexibleDirection( wxBOTH );
+	fgSizer181->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
 	wxStaticBoxSizer* sbSizer10;
-	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Waypoint Arrival") ), wxVERTICAL );
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Options") ), wxVERTICAL );
 	
 	wxFlexGridSizer* fgSizer45;
 	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer45->SetFlexibleDirection( wxBOTH );
 	fgSizer45->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_cbConfirmBearingChange = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Confirm Bearing Change"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_cbConfirmBearingChange = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Confirm Bearing Change\nOn Waypoint Arrival"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer45->Add( m_cbConfirmBearingChange, 0, wxALL, 5 );
+	
+	m_cbInterceptRoute = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Intercept Route\nOn Current Course"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer45->Add( m_cbInterceptRoute, 0, wxALL, 5 );
+	
+	wxString m_cComputationChoices[] = { _("Great Circle (Shortest Distance)"), _("Mercator (Constant Bearings)") };
+	int m_cComputationNChoices = sizeof( m_cComputationChoices ) / sizeof( wxString );
+	m_cComputation = new wxChoice( sbSizer10->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cComputationNChoices, m_cComputationChoices, 0 );
+	m_cComputation->SetSelection( 0 );
+	fgSizer45->Add( m_cComputation, 0, wxALL, 5 );
 	
 	
 	sbSizer10->Add( fgSizer45, 1, wxEXPAND, 5 );
 	
 	
-	fgSizer8->Add( sbSizer10, 1, wxEXPAND, 5 );
+	fgSizer181->Add( sbSizer10, 1, wxEXPAND, 5 );
+	
+	wxStaticBoxSizer* sbSizer5;
+	sbSizer5 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Active Route Windows") ), wxVERTICAL );
+	
+	wxFlexGridSizer* fgSizer16;
+	fgSizer16 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer16->AddGrowableCol( 1 );
+	fgSizer16->SetFlexibleDirection( wxBOTH );
+	fgSizer16->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	wxString m_cbActiveRouteItems0Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway"), _("Deactivate") };
+	int m_cbActiveRouteItems0NChoices = sizeof( m_cbActiveRouteItems0Choices ) / sizeof( wxString );
+	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
+	fgSizer16->Add( m_cbActiveRouteItems0, 0, wxALL|wxEXPAND, 5 );
+	
+	wxString m_cbActiveRouteItems1Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway"), _("Deactivate") };
+	int m_cbActiveRouteItems1NChoices = sizeof( m_cbActiveRouteItems1Choices ) / sizeof( wxString );
+	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
+	fgSizer16->Add( m_cbActiveRouteItems1, 0, wxALL, 5 );
+	
+	
+	sbSizer5->Add( fgSizer16, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer181->Add( sbSizer5, 1, wxEXPAND, 5 );
 	
 	wxFlexGridSizer* fgSizer21;
 	fgSizer21 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -283,7 +309,10 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer21->Add( m_sdbSizer1, 1, wxALIGN_RIGHT|wxEXPAND, 5 );
 	
 	
-	fgSizer8->Add( fgSizer21, 1, wxEXPAND, 5 );
+	fgSizer181->Add( fgSizer21, 1, wxEXPAND, 5 );
+	
+	
+	fgSizer8->Add( fgSizer181, 1, wxEXPAND, 5 );
 	
 	
 	this->SetSizer( fgSizer8 );

@@ -57,6 +57,8 @@ bool PreferencesDialog::Show( bool show )
 
         // Waypoint Arrival
         m_cbConfirmBearingChange->SetValue(p.confirm_bearing_change);
+        m_cbInterceptRoute->SetValue(p.intercept_route);
+        m_cComputation->SetSelection(p.computation == autopilot_route_pi::preferences::MERCATOR);
 
         // Boundary
         m_tBoundary->SetValue(p.boundary_guid);
@@ -118,7 +120,9 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
 
     // Waypoint Arrival
     p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
-
+    p.intercept_route = m_cbInterceptRoute->GetValue();
+    p.computation = (autopilot_route_pi::preferences::ComputationType)m_cComputation->GetSelection();
+        
     // Boundary
     p.boundary_guid = m_tBoundary->GetValue();
     p.boundary_width = m_sBoundaryWidth->GetValue();

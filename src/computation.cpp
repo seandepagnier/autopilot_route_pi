@@ -153,7 +153,7 @@ bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w)
         return false; // spherical circle doesn't intersect great circle
 
     // spherical law of cosines, b is distance from closest position
-    // to where s<<<<<<<<<<<<pherical circle intersects p0<->p1
+    // to where spherical circle intersects p0<->p1
     double b = acos(d/a);
     quaternion q(b, n);
     vector w0 = q.rotate(v), w1 = q.conjugate().rotate(v);
@@ -171,6 +171,28 @@ bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w)
         return true;
     }
     return false;
+}
+
+// set w to the intersection of great circle with (position p, bearing)
+// on great circle p0 and p1 if circle
+bool intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w)
+{
+    vector north(0, 0, 1), c = ll2v(p);
+    quaternion q(bearing, c);
+    vector b = q.rotate(north);
+    vector m = cross(c, b);
+    m.normalize(); // m is plane of p at bearing
+
+    vector v0 = ll2v(p0), v1 = ll2v(p1);
+    vector n = cross(v0, v1);
+    n.normalize(); // n is plane of p0 and p1
+
+    vector i = cross(n, m); // intersection is w
+    w = v2ll(i);
+
+    // ensure w falls on the segment between p0 and p1
+    double d = dot(v0, v1);
+    return dot(i, v0) > d && dot(i, v1) > d;
 }
 
 }

@@ -109,7 +109,7 @@ DECLARE_EVENT_TABLE()
 //----------------------------------------------------------------------------
 // ConsoleCanvas
 //----------------------------------------------------------------------------
-class ConsoleCanvas : public wxDialog
+class ConsoleCanvas : public wxWindow
 {
 public:
       ConsoleCanvas(wxWindow *frame, autopilot_route_pi &pi);
@@ -135,6 +135,7 @@ public:
       AnnunText         *pTRNG;
       AnnunText         *pTTTG;
       CDI               *pCDI;
+      wxButton          *pDeactivate;
 
       wxFont            *pThisLegFont;
       bool               m_bNeedClear;
