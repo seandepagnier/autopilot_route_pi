@@ -26,13 +26,16 @@
 
 #include <math.h>
 #include "computation.h"
-// spherical computations
 
 #ifndef M_PI
       #define M_PI        3.1415926535897931160E0      /* pi */
 #endif
 
-namespace computation
+double deg2rad(double x) { return x * M_PI / 180; }
+double rad2deg(double x) { return x * 180 / M_PI; }
+
+// spherical computations
+namespace computation_gc
 {
 
 struct vector
@@ -80,8 +83,6 @@ private:
 };
 
 
-double deg2rad(double x) { return x * M_PI / 180; }
-double rad2deg(double x) { return x * 180 / M_PI; }
 const double earth_radius_meters       = 6378137.0;
 double m2rad(double x) { return x/earth_radius_meters; }
 
@@ -173,15 +174,15 @@ bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w)
     return false;
 }
 
-// set w to the intersection of great circle with (position p, bearing)
-// on great circle p0 and p1 if circle
-bool intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w)
+// set w to the intersection of great circle with (position p, brg)
+// on great circle p0 and p1
+bool intersect(wp &p, double brg, wp &p0, wp &p1, wp &w)
 {
     vector north(0, 0, 1), c = ll2v(p);
-    quaternion q(bearing, c);
+    quaternion q(brg, c);
     vector b = q.rotate(north);
     vector m = cross(c, b);
-    m.normalize(); // m is plane of p at bearing
+    m.normalize(); // m is plane of p at brg
 
     vector v0 = ll2v(p0), v1 = ll2v(p1);
     vector n = cross(v0, v1);
@@ -193,6 +194,168 @@ bool intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w)
     // ensure w falls on the segment between p0 and p1
     double d = dot(v0, v1);
     return dot(i, v0) > d && dot(i, v1) > d;
+}
+
+}
+
+// mercator calculations
+namespace computation_mc
+{
+
+#include "georef.h"
+
+wp closest_a(wp &p, wp &p0, wp &p1, double &a)
+{
+    double p0x, p0y, p1x, p1y;
+    toSM(p0.lat, p0.lon, p.lat, p.lon, &p0x, &p0y);
+    toSM(p1.lat, p1.lon, p.lat, p.lon, &p1x, &p1y);
+
+/*
+dx = (p1x - p0x)
+dy = (p1y - p0y)
+
+x = p0x + a*dx
+y = p0y + a*dy
+x = b*dy
+y = b*(p0x - p1x)
+
+b*dy = p0x + a*dx
+b*-dx = p0y + a*dy
+
+(p0x + a*dx)*-dx = (p0y + a*dy)*dy
+
+a = -(p0y*dy + p0x*dx) / (dx*dx + dy*dy)
+
+*/
+    double dx = p1x - p0x, dy = p1y - p0y;
+    a = -(p0y*dy + p0x*dx) / (dx*dx + dy*dy);
+    double x = p0x + a*dx, y = p0y + a*dy;
+
+    double lat, lon;
+    fromSM(x, y, p.lat, p.lon, &lat, &lon);
+    return wp(lat, lon);
+}
+    
+// find position closest to p, on line defined by p0 and p1
+wp closest(wp &p, wp &p0, wp &p1)
+{
+    double a;
+    return closest_a(p, p0, p1, a);
+}
+
+// find position closest to p, on segment defined by p0 and p1
+wp closest_seg(wp &p, wp &p0, wp &p1)
+{
+    double a;
+    wp c = closest_a(p, p0, p1, a);
+    if(a < 0)
+        return p0;
+    if(a > 1)
+        return p1;
+    return c;
+}
+
+// find distance between two positions
+double distance(wp &p0, wp &p1)
+{
+    double dist;
+    DistanceBearingMercator(p0.lat, p0.lon, p1.lat, p1.lon, 0, &dist);
+    return dist;
+}
+
+// set w to the intersection of (position p, radius r) on great circle
+// segment defined by p0 and p1 if circle intersects segment twice,
+// return position closest to p1
+bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w)
+{
+    double p0x, p0y, p1x, p1y;
+    toSM(p0.lat, p0.lon, p.lat, p.lon, &p0x, &p0y);
+    toSM(p1.lat, p1.lon, p.lat, p.lon, &p1x, &p1y);
+
+    // circle cannot be projected perfectly in mercator...
+    // this works for small scale anyway, use north
+    double dx, dy;
+    toSM(p.lat + dist/1852.0/60.0, p.lon, p.lat, p.lon, &dx, &dy);
+    double r = sqrt(dx*dx + dy*dy);
+
+    /*
+x^2 + y^2 = r^2
+x = p0x + a * (p1x - p0x)
+y = p0y + a * (p1y - p0y)
+
+(p0x + a * (p1x - p0x))^2 + (p0y + a * (p1y - p0y))^2 = r^2
+
+p0x^2 + a*2*p0x*(p1x-p0x) + a^2*(p1x-p0x)^2 +
+p0y^2 + a*2*p0y*(p1y-p0y) + a^2*(p1y-p0y)^2 = r^2
+
+a^2*((p1x-p0x)^2 + (p1y-p0y)^2) +
+a*(2*p0x*(p1x-p0x) +  2*p0y*(p1y-p0y)) +
+p0x^2 + p0y^2 - r^2 = 0
+
+A = ((p1x-p0x)^2 + (p1y-p0y)^2)
+B = (2*p0x*(p1x-p0x) +  2*p0y*(p1y-p0y))
+C = p0x^2 + p0y^2 - r^2
+
+a = (-B +- sqrt(B^2 - 4*A*C)) / (2*A)
+    */
+
+    double A = (p1x-p0x)*(p1x-p0x) + (p1y-p0y)*(p1y-p0y);
+    double B = 2*p0x*(p1x-p0x) +  2*p0y*(p1y-p0y);
+    double C = p0x*p0x + p0y*p0y - r*r;
+
+    double det = B*B - 4*A*C;
+
+    if(det < 0)
+        return false; // circle does not intersect line
+
+    double a0 = (-B + sqrt(det)) / (2*A);
+    double a1 = (-B - sqrt(det)) / (2*A);
+    double a;
+
+    if(a0 < 0 || a0 > 1) {// a0 invalid
+        if(a1 < 0 || a1 > 1) // a1 invalid
+            return false;
+        a = a1;
+    } else {
+        if(a1 <0 || a1 > 1) // a1 invalid
+            a = a0;
+        else if(a1 > a0) // choose closest to p1
+            a = a1;
+        else
+            a = a0;
+    }
+
+    double x = p0x + a * (p1x - p0x);
+    double y = p0y + a * (p1y - p0y);
+    fromSM(x, y, p.lat, p.lon, &w.lat, &w.lon);
+    return true;
+}
+
+// set w to the intersection of of segment with position p, brg
+// on segment p0 and p1
+bool intersect(wp &p, double brg, wp &p0, wp &p1, wp &w)
+{
+    double p0x, p0y, p1x, p1y;
+    toSM(p0.lat, p0.lon, p.lat, p.lon, &p0x, &p0y);
+    toSM(p1.lat, p1.lon, p.lat, p.lon, &p1x, &p1y);
+/*
+  x = t*cos(brg)
+  y = t*sin(brg)
+  x = p0x + a * (p1x - p0x)
+  y = p0y + a * (p1y - p0y)
+
+  t*cos(brg) = p0x + a * (p1x - p0x)
+  t*sin(brg) = p0y + a * (p1y - p0y)
+
+  a = (p0y*cos(brg) - p0x*sin(brg)) / ((p1x - p0x)*sin(brg) - (p1y - p0y)*cos(brg))
+*/
+    double sb = sin(deg2rad(brg)), cb = cos(deg2rad(brg));
+    double a = (p0y*cb - p0x*sb) / ((p1x - p0x)*sb - (p1y - p0y)*cb);
+    double x = p0x + a * (p1x - p0x);
+    double y = p0y + a * (p1y - p0y);
+
+    fromSM(x, y, p.lat, p.lon, &w.lat, &w.lon);
+    return a >= 0 && a <= 1;
 }
 
 }

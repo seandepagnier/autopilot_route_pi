@@ -32,11 +32,20 @@ struct wp
     double lat, lon;
 };
 
-namespace computation
+namespace computation_gc
 {
     wp closest(wp &p, wp &p0, wp &p1);
     wp closest_seg(wp &p, wp &p0, wp &p1);
     double distance(wp &p0, wp &p1);
     bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w);
-    bool intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w);
+    bool intersect(wp &p, double brg, wp &p0, wp &p1, wp &w);
+}
+
+namespace computation_mc
+{
+    wp closest(wp &p, wp &p0, wp &p1);
+    wp closest_seg(wp &p, wp &p0, wp &p1);
+    double distance(wp &p0, wp &p1);
+    bool intersect_circle(wp &p, double dist, wp &p0, wp &p1, wp &w);
+    bool intersect(wp &p, double brg, wp &p0, wp &p1, wp &w);
 }

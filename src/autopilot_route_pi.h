@@ -76,7 +76,7 @@ class waypoint : public wp {
 public:
     waypoint() {}
     waypoint(double lat, double lon) : wp(lat, lon) {}
-    waypoint(double lat, double lon, wxString name, wxString guid, double ar, double lat0, double lon0);
+    waypoint(double lat, double lon, wxString name, wxString guid, double ar, double ab);
 
     wxString name, GUID;
     double arrival_radius;
@@ -181,6 +181,15 @@ private:
 
     void RearrangeWindow();
 
+    void PositionBearing(double lat0, double lon0, double brg, double dist, double *dlat, double *dlon);
+    void DistanceBearing(double lat0, double lon0, double lat1, double lon1, double *bearing, double *dist);
+
+    wp Closest(wp &p, wp &p0, wp &p1);
+    wp ClosestSeg(wp &p, wp &p0, wp &p1);
+    double Distance(wp &p0, wp &p1);
+    bool IntersectCircle(wp &p, double dist, wp &p0, wp &p1, wp &w);
+    bool Intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w);
+    
     void RequestRoute(wxString guid);
     void AdvanceWaypoint();
     void UpdateWaypoint();
