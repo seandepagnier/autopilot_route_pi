@@ -32,6 +32,8 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	
 	wxFlexGridSizer* fgSizer37;
 	fgSizer37 = new wxFlexGridSizer( 0, 3, 0, 0 );
+	fgSizer37->AddGrowableCol( 0 );
+	fgSizer37->AddGrowableRow( 0 );
 	fgSizer37->SetFlexibleDirection( wxBOTH );
 	fgSizer37->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
@@ -46,23 +48,14 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText57->Wrap( -1 );
 	fgSizer44->Add( m_staticText57, 0, wxALL, 5 );
 	
-	m_sXTEP = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 10, 500, 100 );
+	m_sXTEP = new wxSpinCtrlDouble( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10000, 0, 1 );
+	m_sXTEP->SetMaxSize( wxSize( 100,-1 ) );
+	
 	fgSizer44->Add( m_sXTEP, 0, wxALL, 5 );
 	
 	m_staticText561 = new wxStaticText( m_panel5, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText561->Wrap( -1 );
-	fgSizer44->Add( m_staticText561, 0, wxALL, 5 );
-	
-	m_staticText571 = new wxStaticText( m_panel5, wxID_ANY, _("XTE Derivative"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText571->Wrap( -1 );
-	fgSizer44->Add( m_staticText571, 0, wxALL, 5 );
-	
-	m_sXTED = new wxSpinCtrl( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 500, 0 );
-	fgSizer44->Add( m_sXTED, 0, wxALL, 5 );
-	
-	m_staticText56 = new wxStaticText( m_panel5, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText56->Wrap( -1 );
-	fgSizer44->Add( m_staticText56, 0, wxALL, 5 );
+	fgSizer44->Add( m_staticText561, 0, wxALL|wxEXPAND, 5 );
 	
 	
 	m_panel5->SetSizer( fgSizer44 );
@@ -93,12 +86,19 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer19->SetFlexibleDirection( wxBOTH );
 	fgSizer19->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 	
-	m_sRoutePositionBearingDistance = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1, 1000, 100 );
+	m_sRoutePositionBearingDistance = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 100,-1 ), wxSP_ARROW_KEYS, 1, 1000, 100 );
 	fgSizer19->Add( m_sRoutePositionBearingDistance, 0, wxALL, 5 );
 	
 	m_staticText74 = new wxStaticText( m_panel91, wxID_ANY, _("Meters"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText74->Wrap( -1 );
 	fgSizer19->Add( m_staticText74, 0, wxALL, 5 );
+	
+	m_staticText10 = new wxStaticText( m_panel91, wxID_ANY, _("Max Error Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10->Wrap( -1 );
+	fgSizer19->Add( m_staticText10, 0, wxALL, 5 );
+	
+	m_sRoutePositionBearingMaxAngle = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
+	fgSizer19->Add( m_sRoutePositionBearingMaxAngle, 0, wxALL, 5 );
 	
 	
 	m_panel91->SetSizer( fgSizer19 );

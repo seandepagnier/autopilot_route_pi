@@ -104,11 +104,11 @@ int autopilot_route_pi::Init(void)
     // Mode
     p.mode = pConf->Read("Mode", "Route Position Bearing");
     p.xte_multiplier = pConf->Read("XTEP", 1.0);
-    p.xte_rate_multiplier = pConf->Read("XTED", 0.0);
     p.route_position_bearing_mode = (preferences::RoutePositionBearingMode)
         pConf->Read("RoutePositionBearingMode", 0L);
     p.route_position_bearing_distance = pConf->Read("RoutePositionBearingDistance", 100);
     p.route_position_bearing_time = pConf->Read("RoutePositionBearingTime", 100);
+    p.route_position_bearing_max_angle = pConf->Read("RoutePositionBearingMaxAngle", 30);
     
     // Active Route Window
     wxString labels[2] = {pConf->Read("ActiveRouteItems0", "XTE;BRG;RNG;TTG;VMG;Highway;Deactivate;"),
@@ -178,11 +178,10 @@ bool autopilot_route_pi::DeInit(void)
     // Mode
     pConf->Write("Mode", p.mode);
     pConf->Write("XTEP", p.xte_multiplier);
-    pConf->Write("XTED", p.xte_rate_multiplier);
     pConf->Write("RoutePositionBearingMode", (int)p.route_position_bearing_mode);
     pConf->Write("RoutePositionBearingDistance", p.route_position_bearing_distance);
     pConf->Write("RoutePositionBearingTime", p.route_position_bearing_time);
-    
+    pConf->Write("RoutePositionBearingMaxAngle", p.route_position_bearing_max_angle);
     // Active Route Window
     for(int i=0; i<2; i++) {
         wxString labels;
@@ -563,7 +562,7 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
                 for(int i=0; i<size; i++) {
                     double lat = w[i]["lat"].asDouble(), lon = w[i]["lon"].asDouble();
                     double brg;
-                    DistanceBearing(lat, lon, lat0, lon0, &brg, 0);
+                    DistanceBearing(lat0, lon0, lat, lon, &brg, 0);
                     waypoint wp(lat, lon, w[i]["Name"].asString(), w[i]["GUID"].asString(),
                                 w[i]["ArrivalRadius"].asDouble(), brg);
 
@@ -749,13 +748,15 @@ void autopilot_route_pi::UpdateWaypoint()
 double autopilot_route_pi::FindXTE()
 {
     // find a position along this bearing
-    double dlat, dlon, xte;
+    double dlat, dlon, brg, xte;
     PositionBearing(m_current_wp.lat, m_current_wp.lon, m_current_wp.arrival_bearing, 1, &dlat, &dlon);
     wp b(m_lastfix.Lat, m_lastfix.Lon), w(dlat, dlon);
     wp p = Closest(b, m_current_wp, w);
-    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, 0, &xte);
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, &brg, &xte);
     if(isnan(xte))
         xte = 0;
+    else if(heading_resolve(brg - m_current_wp.arrival_bearing) < 0)
+        xte = -xte;
     return xte;
 }    
 
@@ -764,11 +765,10 @@ void autopilot_route_pi::ComputeXTE()
     UpdateWaypoint();
 
     double xte = FindXTE();
-    m_xte_rate = xte - m_current_xte;
     m_current_xte = xte;
     
     m_current_bearing = m_current_wp.arrival_bearing;
-    m_current_xte = xte*prefs.xte_multiplier + m_xte_rate*prefs.xte_rate_multiplier;
+    m_current_xte = xte*prefs.xte_multiplier;
 }
 
 void autopilot_route_pi::ComputeWaypointBearing()
@@ -841,6 +841,15 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     m_current_wp.GUID = "";
 
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
+
+    // clamp to max angle
+    double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
+    if(ang > p.route_position_bearing_max_angle)
+        m_current_bearing = m_current_wp.arrival_bearing + p.route_position_bearing_max_angle;
+    else
+    if(ang < -p.route_position_bearing_max_angle)
+        m_current_bearing = m_current_wp.arrival_bearing - p.route_position_bearing_max_angle;
+        
     m_current_xte = 0;
 }
 

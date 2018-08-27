@@ -124,13 +124,14 @@ public:
         wxString mode;
 
         // Standard XTE
-        double xte_multiplier, xte_rate_multiplier;
+        double xte_multiplier;
 
         // Waypoint Bearing
 
         // Route Position Bearing
         enum RoutePositionBearingMode {DISTANCE, TIME} route_position_bearing_mode;
         double route_position_bearing_distance, route_position_bearing_time;
+        double route_position_bearing_max_angle;
 
         // Active Route Window
         std::map<wxString, bool> active_route_labels[2];
@@ -228,15 +229,8 @@ private:
     bool m_bArrival;
 
     double m_current_bearing, m_current_xte;
-    // for xte mode
-    double m_xte_rate;
 
-    // for xte boundary mode
-    
-    // for bearing mode
-    
     // optimum route mode variables
-
     double m_avg_sog;
 };
 
