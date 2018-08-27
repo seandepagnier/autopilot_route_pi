@@ -175,6 +175,7 @@ protected:
     PlugIn_Position_Fix_Ex m_lastfix;
 
 private:
+    void Recompute();
     void SetCursorLatLon(double lat, double lon);
     void SetNMEASentence(wxString &sentence);
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);

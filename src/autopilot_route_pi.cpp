@@ -429,9 +429,6 @@ void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
 
 void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
 {
-    if(m_current_wp.GUID.IsEmpty())
-        return;
-
     wxPoint r1, r2;
     dc.SetPen(wxPen(*wxGREEN, 2));
     GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
@@ -470,13 +467,18 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
     if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10)
         RequestRoute(m_active_guid);
     
+    Recompute();
+
+    m_ConsoleCanvas->UpdateRouteData();
+    SendNMEA();
+}
+
+void autopilot_route_pi::Recompute()
+{
     if(prefs.mode == "Standard XTE") ComputeXTE(); else
     if(prefs.mode == "Waypoint Bearing") ComputeWaypointBearing(); else
     if(prefs.mode == "Route Position Bearing") ComputeRoutePositionBearing(); else
         prefs.mode = "Route Position Bearing";
-
-    m_ConsoleCanvas->UpdateRouteData();
-    SendNMEA();
 }
 
 void autopilot_route_pi::SetCursorLatLon(double lat, double lon)
@@ -527,7 +529,6 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
         }
     } else if(message_id == "OCPN_RTE_ACTIVATED") {
         if(ParseMessage( message_body, root )) {
-            m_current_wp.GUID = "";
             // when route is activated, request the route
             RequestRoute(root["GUID"].asString());
             ShowConsoleCanvas();
@@ -547,73 +548,76 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
             GetFrameAuiManager()->Update();
         }
     } else if(message_id == "OCPN_ROUTE_RESPONSE") {
-        if(ParseMessage( message_body, root )) {
-            if(root["error"].asBool())
-                return;
-            wxString guid = root["GUID"].asString();
-            if(guid == m_active_request_guid) {
-                m_active_request_time = wxDateTime::Now();
-                
-                m_active_guid = guid;
-                Json::Value w = root["waypoints"];
-                int size = w.size();
-                m_route.clear();
-                double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
-                for(int i=0; i<size; i++) {
-                    double lat = w[i]["lat"].asDouble(), lon = w[i]["lon"].asDouble();
-                    double brg;
-                    DistanceBearing(lat0, lon0, lat, lon, &brg, 0);
-                    waypoint wp(lat, lon, w[i]["Name"].asString(), w[i]["GUID"].asString(),
-                                w[i]["ArrivalRadius"].asDouble(), brg);
-
-                    // set arrival bearing to current course for first waypoint
-                    if(i == 0 && m_avg_sog > 1)
-                        wp.arrival_bearing = m_lastfix.Cog;
-                    m_route.push_back(wp);
-                    lat0 = lat, lon0 = lon;
+        if(!ParseMessage( message_body, root ))
+            return;
+        
+        if(root["error"].asBool())
+            return;
+        
+        wxString guid = root["GUID"].asString();
+        if(guid != m_active_request_guid)
+            return;
+        
+        m_active_request_time = wxDateTime::Now();        
+        m_active_guid = guid;
+        Json::Value w = root["waypoints"];
+        int size = w.size();
+        m_route.clear();
+        double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
+        for(int i=0; i<size; i++) {
+            double lat = w[i]["lat"].asDouble(), lon = w[i]["lon"].asDouble();
+            double brg;
+            DistanceBearing(lat0, lon0, lat, lon, &brg, 0);
+            waypoint wp(lat, lon, w[i]["Name"].asString(), w[i]["GUID"].asString(),
+                        w[i]["ArrivalRadius"].asDouble(), brg);
+            
+            // set arrival bearing to current course for first waypoint
+            if(i == 0 && m_avg_sog > 1)
+                wp.arrival_bearing = m_lastfix.Cog;
+            m_route.push_back(wp);
+            lat0 = lat, lon0 = lon;
+        }
+        
+        // add interception points
+        if(prefs.intercept_route) {
+            ap_route_iterator it = m_route.begin(), closest;
+            wp p0 = *it;
+            wp boat(m_lastfix.Lat, m_lastfix.Lon);
+            double mindist = INFINITY;
+            // find closest segment
+            for(it++; it!=m_route.end(); it++) {
+                waypoint p1 = *it;
+                wp x = ClosestSeg(boat, p0, p1);
+                double dist = Distance(boat, x);
+                if(dist < mindist) {
+                    mindist = dist;
+                    closest = it;
                 }
-
-                // add interception points
-                if(prefs.intercept_route) {
-                    ap_route_iterator it = m_route.begin(), closest;
-                    wp p0 = *it;
-                    wp boat(m_lastfix.Lat, m_lastfix.Lon);
-                    double mindist = INFINITY;
-                    // find closest segment
-                    for(it++; it!=m_route.end(); it++) {
-                        waypoint p1 = *it;
-                        wp x = ClosestSeg(boat, p0, p1);
-                        double dist = Distance(boat, x);
-                        if(dist < mindist) {
-                            mindist = dist;
-                            closest = it;
-                        }
-                        p0 = p1;
-                    }
-
-                    // do we intersect this segment on current course?
-                    wp p1 = *closest, w;
-                    closest--;
-                    p0 = *closest;
-                    // insert boat position after p0
-                    double brg;
-                    DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
-                    waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
-                    m_route.insert(closest, boat_wp);
-
-                    // if intersect, insert this position
-                    if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
-                        double brg;
-                        DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
-                                   closest->arrival_radius, brg);
-                        m_route.insert(closest, i);
-                    }
-                }
-
-                m_current_wp.GUID = "";
-                m_Timer.Start(1000/prefs.rate);
+                p0 = p1;
+            }
+            
+            // do we intersect this segment on current course?
+            wp p1 = *closest, w;
+            closest--;
+            p0 = *closest;
+            // insert boat position after p0
+            double brg;
+            DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
+            waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
+            m_route.insert(closest, boat_wp);
+            
+            // if intersect, insert this position
+            if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
+                double brg;
+                DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
+                                                                                                              closest->arrival_radius, brg);
+                m_route.insert(closest, i);
             }
         }
+        
+        m_current_wp.GUID = "";
+        Recompute();
+        m_Timer.Start(1000/prefs.rate);
     }
 }
 
@@ -844,11 +848,13 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
 
     // clamp to max angle
     double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
-    if(ang > p.route_position_bearing_max_angle)
-        m_current_bearing = m_current_wp.arrival_bearing + p.route_position_bearing_max_angle;
+    double brg = m_current_wp.arrival_bearing;
+    double max_angle = prefs.route_position_bearing_max_angle;
+    if(ang > max_angle)
+        m_current_bearing = brg + max_angle;
     else
-    if(ang < -p.route_position_bearing_max_angle)
-        m_current_bearing = m_current_wp.arrival_bearing - p.route_position_bearing_max_angle;
+    if(ang < -max_angle)
+        m_current_bearing = brg - max_angle;
         
     m_current_xte = 0;
 }
