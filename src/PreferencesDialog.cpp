@@ -34,7 +34,7 @@ bool PreferencesDialog::Show( bool show )
         autopilot_route_pi::preferences &p = m_pi.prefs;
 
         // Mode
-        for(int i=0; i<m_cbMode->GetPageCount(); i++)
+        for(unsigned int i=0; i<m_cbMode->GetPageCount(); i++)
             if(m_cbMode->GetPageText(i) == p.mode) {
                 m_cbMode->SetSelection(i);
                 break;

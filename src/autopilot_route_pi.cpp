@@ -27,7 +27,7 @@
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 
-#include "apdc.h"
+#include "plugingl/pidc.h"
 
 #include "wxJSON/jsonreader.h"
 #include "wxJSON/jsonwriter.h"
@@ -76,7 +76,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_110(ppimgr)
+    : opencpn_plugin_111(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -264,14 +264,14 @@ void autopilot_route_pi::ShowPreferencesDialog( wxWindow* parent )
 
 bool autopilot_route_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
-    apDC odc(dc);
+    piDC odc(dc);
     Render(odc, *vp);
     return true;
 }
 
 bool autopilot_route_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
-    apDC odc;
+    piDC odc;
     glEnable( GL_BLEND );
     Render(odc, *vp);
     glDisable( GL_BLEND );
@@ -384,7 +384,7 @@ void autopilot_route_pi::DeactivateRoute()
     SendPluginMessageEmpty("OCPN_RTE_DEACTIVATED");
 }
 
-void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
 {
     if(m_active_guid.IsEmpty())
         return;
@@ -401,7 +401,7 @@ void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
     dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
-void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::RenderArrivalWaypoint(piDC &dc, PlugIn_ViewPort &vp)
 {
     if(m_current_wp.GUID.IsEmpty())
         return;
@@ -427,7 +427,7 @@ void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
     dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
-void autopilot_route_pi::RenderRoutePositionBearing(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::RenderRoutePositionBearing(piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint r1;
     dc.SetPen(wxPen(*wxGREEN, 2));

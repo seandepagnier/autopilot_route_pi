@@ -35,7 +35,7 @@
 #include "wxWTranslateCatalog.h"
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    10
+#define     MY_API_VERSION_MINOR    11
 
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
@@ -66,7 +66,7 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
-class apDC;
+class piDC;
 class ConsoleCanvas;
 class PreferencesDialog;
 
@@ -86,7 +86,7 @@ public:
 typedef std::list<waypoint> ap_route;
 typedef std::list<waypoint>::iterator ap_route_iterator;
 
-class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_110
+class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_111
 {
     friend ConsoleCanvas;
 public:
@@ -163,9 +163,9 @@ public:
                         double *rng, double *nrng);
     void DeactivateRoute();
 protected:
-    void Render(apDC &dc, PlugIn_ViewPort &vp);
-    void RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp);
-    void RenderRoutePositionBearing(apDC &dc, PlugIn_ViewPort &vp);
+    void Render(piDC &dc, PlugIn_ViewPort &vp);
+    void RenderArrivalWaypoint(piDC &dc, PlugIn_ViewPort &vp);
+    void RenderRoutePositionBearing(piDC &dc, PlugIn_ViewPort &vp);
     void OnTimer( wxTimerEvent & );
 
     wxPoint m_cursor_position;
