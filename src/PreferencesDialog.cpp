@@ -41,11 +41,10 @@ bool PreferencesDialog::Show( bool show )
             }
 
         m_sXTEP->SetValue(p.xte_multiplier*100);
-        m_sXTED->SetValue(p.xte_rate_multiplier*100);
         m_cbRoutePositionBearingMode->SetSelection(p.route_position_bearing_mode);
         m_sRoutePositionBearingDistance->SetValue(p.route_position_bearing_distance);
         m_sRoutePositionBearingTime->SetValue(p.route_position_bearing_time);
-    
+        m_sRoutePositionBearingMaxAngle->SetValue(p.route_position_bearing_max_angle);
         // Active Route Window
         wxCheckListBox *cbActiveRouteItems[2] = {m_cbActiveRouteItems0, m_cbActiveRouteItems1};
         for(unsigned int ind = 0; ind < 2; ind++)
@@ -57,6 +56,8 @@ bool PreferencesDialog::Show( bool show )
 
         // Waypoint Arrival
         m_cbConfirmBearingChange->SetValue(p.confirm_bearing_change);
+        m_cbInterceptRoute->SetValue(p.intercept_route);
+        m_cComputation->SetSelection(p.computation == autopilot_route_pi::preferences::MERCATOR);
 
         // Boundary
         m_tBoundary->SetValue(p.boundary_guid);
@@ -103,11 +104,11 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     // Mode
     p.mode = m_cbMode->GetPageText(m_cbMode->GetSelection());
     p.xte_multiplier = m_sXTEP->GetValue() / 100.0;
-    p.xte_rate_multiplier = m_sXTED->GetValue() / 100.0;
     p.route_position_bearing_mode = (autopilot_route_pi::preferences::RoutePositionBearingMode)
         m_cbRoutePositionBearingMode->GetSelection();
     p.route_position_bearing_distance = m_sRoutePositionBearingDistance->GetValue();
     p.route_position_bearing_time = m_sRoutePositionBearingTime->GetValue();
+    p.route_position_bearing_max_angle = m_sRoutePositionBearingMaxAngle->GetValue();
     
     // Active Route Window
     wxCheckListBox *cbActiveRouteItems[2] = {m_cbActiveRouteItems0, m_cbActiveRouteItems1};
@@ -118,7 +119,9 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
 
     // Waypoint Arrival
     p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
-
+    p.intercept_route = m_cbInterceptRoute->GetValue();
+    p.computation = (autopilot_route_pi::preferences::ComputationType)m_cComputation->GetSelection();
+        
     // Boundary
     p.boundary_guid = m_tBoundary->GetValue();
     p.boundary_width = m_sBoundaryWidth->GetValue();

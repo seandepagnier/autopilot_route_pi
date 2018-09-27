@@ -18,7 +18,7 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
+v *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
@@ -26,11 +26,12 @@
 
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
+#include <wx/aui/aui.h>
 
 #include "plugingl/pidc.h"
 
-#include "wxJSON/jsonreader.h"
-#include "wxJSON/jsonwriter.h"
+#include "json/json.h"
+
 #include "nmea0183/nmea0183.h"
 
 #include "georef.h"
@@ -62,10 +63,9 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 }
 
 waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
-                   double ar, double lat0, double lon0)
-    : wp(lat, lon), name(n), GUID(guid), arrival_radius(ar)
+                   double ar, double ab)
+    : wp(lat, lon), name(n), GUID(guid), arrival_radius(ar), arrival_bearing(ab)
 {
-    ll_gc_ll_reverse(lat0, lon0, lat, lon, &arrival_bearing, 0);
 }
 
 
@@ -102,16 +102,16 @@ int autopilot_route_pi::Init(void)
     preferences &p = prefs;
 
     // Mode
-    p.mode = pConf->Read("Mode", "");
+    p.mode = pConf->Read("Mode", "Route Position Bearing");
     p.xte_multiplier = pConf->Read("XTEP", 1.0);
-    p.xte_rate_multiplier = pConf->Read("XTED", 0.0);
     p.route_position_bearing_mode = (preferences::RoutePositionBearingMode)
         pConf->Read("RoutePositionBearingMode", 0L);
     p.route_position_bearing_distance = pConf->Read("RoutePositionBearingDistance", 100);
     p.route_position_bearing_time = pConf->Read("RoutePositionBearingTime", 100);
+    p.route_position_bearing_max_angle = pConf->Read("RoutePositionBearingMaxAngle", 30);
     
     // Active Route Window
-    wxString labels[2] = {pConf->Read("ActiveRouteItems0", "XTE;BRG;RNG;TTG;VMG;Highway;"),
+    wxString labels[2] = {pConf->Read("ActiveRouteItems0", "XTE;BRG;RNG;TTG;VMG;Highway;Deactivate;"),
                           pConf->Read("ActiveRouteItems1", "XTE;Route ETA;Route RNG;Route TTG;Highway;")};
     for(int i=0; i<2; i++) {
         while(labels[i].size()) {
@@ -120,8 +120,10 @@ int autopilot_route_pi::Init(void)
         }
     }
 
-    // Waypoint Arrival
+    // options
     p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
+    p.intercept_route = (bool)pConf->Read("InterceptRoute", 1L);
+    p.computation = pConf->Read("Computation", "Great Circle") == "Mercator" ? preferences::MERCATOR : preferences::GREAT_CIRCLE;
 
     // Boundary
     p.boundary_guid = pConf->Read("Boundary", "");
@@ -155,8 +157,7 @@ bool autopilot_route_pi::DeInit(void)
 {    
     PlugInHandleAutopilotRoute(false);
     delete m_PreferencesDialog;
-    delete m_ConsoleCanvas;
-   
+
     m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler( autopilot_route_pi::OnTimer ), NULL, this);
     
     RemovePlugInTool(m_leftclick_tool_id);
@@ -164,16 +165,23 @@ bool autopilot_route_pi::DeInit(void)
     // save config
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath ( _T( "/Settings/AutopilotRoute" ) );
+
+    if(m_ConsoleCanvas) {
+        wxPoint p = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_pos;
+        pConf->Write("PosX", p.x);
+        pConf->Write("PosY", p.y);
+    }
+    delete m_ConsoleCanvas;
+   
     preferences &p = prefs;
 
     // Mode
     pConf->Write("Mode", p.mode);
     pConf->Write("XTEP", p.xte_multiplier);
-    pConf->Write("XTED", p.xte_rate_multiplier);
     pConf->Write("RoutePositionBearingMode", (int)p.route_position_bearing_mode);
     pConf->Write("RoutePositionBearingDistance", p.route_position_bearing_distance);
     pConf->Write("RoutePositionBearingTime", p.route_position_bearing_time);
-    
+    pConf->Write("RoutePositionBearingMaxAngle", p.route_position_bearing_max_angle);
     // Active Route Window
     for(int i=0; i<2; i++) {
         wxString labels;
@@ -185,6 +193,8 @@ bool autopilot_route_pi::DeInit(void)
     }
     // Waypoint Arrival
     pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
+    pConf->Write("InterceptRoute", p.intercept_route);
+    pConf->Write("Computation", p.computation == preferences::MERCATOR ? "Mercator" : "Great Circle");
 
     // Boundary
     pConf->Write("Boundary", p.boundary_guid);
@@ -281,12 +291,41 @@ bool autopilot_route_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort 
 void autopilot_route_pi::ShowConsoleCanvas()
 {
     if( !m_ConsoleCanvas ) {
+        wxFileConfig *pConf = GetOCPNConfigObject();
+        pConf->SetPath ( _T( "/Settings/AutopilotRoute" ) );
+        wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
+        
         m_ConsoleCanvas = new ConsoleCanvas( GetOCPNCanvasWindow(), *this );
+        wxSize sz = m_ConsoleCanvas->GetSize();
+        wxAuiPaneInfo p = wxAuiPaneInfo().
+            Name( "Console Canvas" ).
+            Caption( "Console Canvas" ).
+            CaptionVisible( false ).
+            TopDockable(false).
+            BottomDockable(false).
+            LeftDockable(true).
+            RightDockable(true).
+            MinSize(wxSize(20, 20)).
+            BestSize(sz).
+            FloatingSize(sz).
+            FloatingPosition(pos).
+            Float().
+            Gripper(false);
+        wxAuiManager *pauimgr = GetFrameAuiManager();
+        pauimgr->AddPane(m_ConsoleCanvas, p);
+        pauimgr->Update();
         SetColorScheme(m_colorscheme);
+        m_ConsoleCanvas->Show();
     }
 
-    m_ConsoleCanvas->Show();
     m_ConsoleCanvas->ShowWithFreshFonts();
+    GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Show(true);
+    GetFrameAuiManager()->Update();
+    wxSize sz = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_size;
+    sz.y++; // horrible stupid hack to make things look right
+    GetFrameAuiManager()->GetPane(m_ConsoleCanvas).FloatingSize(sz);
+    GetFrameAuiManager()->Update();
+
 }
 
 void autopilot_route_pi::ShowPreferences()
@@ -341,12 +380,8 @@ double autopilot_route_pi::Declination()
 {
     if(prefs.magnetic &&
        (!m_declinationTime.IsValid() || (wxDateTime::Now() - m_declinationTime).GetSeconds() > 1200)) {
-        wxJSONWriter w;
-        wxString out;
-        wxJSONValue v;
-        w.Write(v, out);
         m_declination = NAN;
-        SendPluginMessage(wxString(_T("WMM_VARIATION_BOAT_REQUEST")), out);
+        SendPluginMessage("WMM_VARIATION_BOAT_REQUEST", "");
     }
     return m_declination;
 }
@@ -362,26 +397,17 @@ bool autopilot_route_pi::GetConsoleInfo(double &sog, double &cog,
 
     if(rng) {
         double rbrg;
-        ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon,
-                         m_current_wp.lat, m_current_wp.lon, &rbrg, rng);
+        DistanceBearing(m_lastfix.Lat, m_lastfix.Lon,
+                        m_current_wp.lat, m_current_wp.lon, &rbrg, rng);
         *nrng = *rng * acos((rbrg - bearing)*M_PI/180);
     }
     
     return true;
 }
 
-static void SendPluginMessageEmpty(wxString id)
-{
-    wxJSONWriter w;
-    wxString out;
-    wxJSONValue v;
-    w.Write(v, out);
-    SendPluginMessage(id, out);
-}
-
 void autopilot_route_pi::DeactivateRoute()
 {
-    SendPluginMessageEmpty("OCPN_RTE_DEACTIVATED");
+    SendPluginMessage("OCPN_RTE_DEACTIVATED", "");
 }
 
 void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
@@ -403,9 +429,6 @@ void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
 
 void autopilot_route_pi::RenderArrivalWaypoint(piDC &dc, PlugIn_ViewPort &vp)
 {
-    if(m_current_wp.GUID.IsEmpty())
-        return;
-
     wxPoint r1, r2;
     dc.SetPen(wxPen(*wxGREEN, 2));
     GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
@@ -444,13 +467,18 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
     if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10)
         RequestRoute(m_active_guid);
     
-    if(prefs.mode == "Standard XTE") ComputeXTE(); else
-    if(prefs.mode == "Waypoint Bearing") ComputeWaypointBearing(); else
-    if(prefs.mode == "Route Position Bearing") ComputeRoutePositionBearing(); else
-        prefs.mode = "Standard XTE";
+    Recompute();
 
     m_ConsoleCanvas->UpdateRouteData();
     SendNMEA();
+}
+
+void autopilot_route_pi::Recompute()
+{
+    if(prefs.mode == "Standard XTE") ComputeXTE(); else
+    if(prefs.mode == "Waypoint Bearing") ComputeWaypointBearing(); else
+    if(prefs.mode == "Route Position Bearing") ComputeRoutePositionBearing(); else
+        prefs.mode = "Route Position Bearing";
 }
 
 void autopilot_route_pi::SetCursorLatLon(double lat, double lon)
@@ -473,26 +501,13 @@ void autopilot_route_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
         m_avg_sog = m_avg_sog*.9 + pfix.Sog*.1;
 }
 
-static bool ParseMessage(wxString &message_body, wxJSONValue &root)
+static bool ParseMessage(wxString &message_body, Json::Value &root)
 {
-    wxJSONReader reader;
-    int numErrors = reader.Parse( message_body, &root );
-    if ( !numErrors )
+    Json::Reader reader;
+    if(reader.parse( std::string(message_body), root ))
         return true;
     
-    const wxArrayString& errors = reader.GetErrors();
-    wxString    sLogMessage;
-    for(int i = 0; i < (int)errors.GetCount(); i++)
-    {
-        if(i == 0) {
-            sLogMessage.Append(wxT("watchdog_pi: Error parsing JSON message - "));
-            sLogMessage.Append( message_body );
-            sLogMessage.Append(wxT(", error text: "));
-        } else
-            sLogMessage.Append(wxT("\n"));
-        sLogMessage.append( errors.Item( i ) );
-        wxLogMessage( sLogMessage );
-    }
+    wxLogMessage(wxString("autopilot_route_pi: Error parsing JSON message: ") + reader.getFormattedErrorMessages() );
     return false;
 }
 
@@ -500,7 +515,7 @@ static bool ParseMessage(wxString &message_body, wxJSONValue &root)
 void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
     // construct the JSON root object
-    wxJSONValue  root;
+    Json::Value  root;
     // construct a JSON parser
     wxString    out;
     
@@ -509,18 +524,17 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
     } else if(message_id == wxS("AIS")) {
     } else if(message_id == _T("WMM_VARIATION_BOAT")) {
         if(ParseMessage( message_body, root )) {
-            root[_T("Decl")].AsString().ToDouble(&m_declination);
+            wxString(root["Decl"].asString()).ToDouble(&m_declination);
             m_declinationTime = wxDateTime::Now();
         }
     } else if(message_id == "OCPN_RTE_ACTIVATED") {
         if(ParseMessage( message_body, root )) {
-            m_current_wp.GUID = "";
             // when route is activated, request the route
-            RequestRoute(root[_T("GUID")].AsString());
+            RequestRoute(root["GUID"].asString());
             ShowConsoleCanvas();
         }
     } else if(message_id == "OCPN_WPT_ACTIVATED") {
-        wxString guid = root[_T("GUID")].AsString();
+        wxString guid = root["GUID"].asString();
         m_last_wpt_activated_guid = guid;
         //ShowConsoleCanvas();
     } else if(message_id == "OCPN_WPT_ARRIVED") {
@@ -528,39 +542,82 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
         m_Timer.Stop();
         m_active_guid = "";
         m_active_request_guid = "";
-        if( m_ConsoleCanvas )
-            m_ConsoleCanvas->Hide();
-
+        if( m_ConsoleCanvas ) {
+            GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Float();
+            GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Show(false);
+            GetFrameAuiManager()->Update();
+        }
     } else if(message_id == "OCPN_ROUTE_RESPONSE") {
-        if(ParseMessage( message_body, root )) {
-            if(root["error"].AsBool())
-                return;
-            wxString guid = root["GUID"].AsString();
-            if(guid == m_active_request_guid) {
-                m_active_request_time = wxDateTime::Now();
-                
-                m_active_guid = guid;
-                wxJSONValue w = root["waypoints"];
-                int size = w.Size();
-                m_route.clear();
-                double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
-                for(int i=0; i<size; i++) {
-                    double lat = w[i]["lat"].AsDouble(), lon = w[i]["lon"].AsDouble();
-                    waypoint wp(lat, lon, w[i]["Name"].AsString(), w[i]["GUID"].AsString(),
-                                w[i]["ArrivalRadius"].AsDouble(), lat0, lon0);
-
-                    // set arrival bearing to current course for first waypoint
-                    if(i == 0 && m_avg_sog > 1)
-                        wp.arrival_bearing = m_lastfix.Cog;
-                    m_route.push_back(wp);
-                    lat0 = lat, lon0 = lon;
+        if(!ParseMessage( message_body, root ))
+            return;
+        
+        if(root["error"].asBool())
+            return;
+        
+        wxString guid = root["GUID"].asString();
+        if(guid != m_active_request_guid)
+            return;
+        
+        m_active_request_time = wxDateTime::Now();        
+        m_active_guid = guid;
+        Json::Value w = root["waypoints"];
+        int size = w.size();
+        m_route.clear();
+        double lat0 = m_lastfix.Lat, lon0 = m_lastfix.Lon;
+        for(int i=0; i<size; i++) {
+            double lat = w[i]["lat"].asDouble(), lon = w[i]["lon"].asDouble();
+            double brg;
+            DistanceBearing(lat0, lon0, lat, lon, &brg, 0);
+            waypoint wp(lat, lon, w[i]["Name"].asString(), w[i]["GUID"].asString(),
+                        w[i]["ArrivalRadius"].asDouble(), brg);
+            
+            // set arrival bearing to current course for first waypoint
+            if(i == 0 && m_avg_sog > 1)
+                wp.arrival_bearing = m_lastfix.Cog;
+            m_route.push_back(wp);
+            lat0 = lat, lon0 = lon;
+        }
+        
+        // add interception points
+        if(prefs.intercept_route) {
+            ap_route_iterator it = m_route.begin(), closest;
+            wp p0 = *it;
+            wp boat(m_lastfix.Lat, m_lastfix.Lon);
+            double mindist = INFINITY;
+            // find closest segment
+            for(it++; it!=m_route.end(); it++) {
+                waypoint p1 = *it;
+                wp x = ClosestSeg(boat, p0, p1);
+                double dist = Distance(boat, x);
+                if(dist < mindist) {
+                    mindist = dist;
+                    closest = it;
                 }
-
-                m_current_wp.GUID = "";
-                    
-                m_Timer.Start(1000/prefs.rate);
+                p0 = p1;
+            }
+            
+            // do we intersect this segment on current course?
+            wp p1 = *closest, w;
+            closest--;
+            p0 = *closest;
+            // insert boat position after p0
+            double brg;
+            DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
+            waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
+            m_route.insert(closest, boat_wp);
+            
+            // if intersect, insert this position
+            if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
+                double brg;
+                DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
+                                                                                                              closest->arrival_radius, brg);
+                m_route.insert(closest, i);
             }
         }
+        
+        m_current_wp.GUID = "";
+        Recompute();
+        m_Timer.Start(1000/prefs.rate);
     }
 }
 
@@ -569,15 +626,65 @@ void autopilot_route_pi::RearrangeWindow()
     SetColorScheme(PI_ColorScheme());
 }
 
+void autopilot_route_pi::PositionBearing(double lat0, double lon0, double brg, double dist, double *dlat, double *dlon)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        PositionBearingDistanceMercator_Plugin(lat0, lon0, brg, dist, dlat, dlon);
+    else
+        ll_gc_ll(lat0, lon0, brg, dist, dlat, dlon);
+}
+
+void autopilot_route_pi::DistanceBearing(double lat0, double lon0, double lat1, double lon1, double *brg, double *dist)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        DistanceBearingMercator_Plugin(lat0, lon0, lat1, lon1, brg, dist);
+    else
+        ll_gc_ll_reverse(lat0, lon0, lat1, lon1, brg, dist);
+}
+
+
+wp autopilot_route_pi::Closest(wp &p, wp &p0, wp &p1)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        return computation_mc::closest(p, p0, p1);
+    return computation_gc::closest(p, p0, p1);
+}
+    
+wp autopilot_route_pi::ClosestSeg(wp &p, wp &p0, wp &p1)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        return computation_mc::closest_seg(p, p0, p1);
+    return computation_gc::closest_seg(p, p0, p1);
+}
+
+double autopilot_route_pi::Distance(wp &p0, wp &p1)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        return computation_mc::distance(p0, p1);
+    return computation_gc::distance(p0, p1);
+}
+
+bool autopilot_route_pi::IntersectCircle(wp &p, double dist, wp &p0, wp &p1, wp &w)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        return computation_mc::intersect_circle(p, dist, p0, p1, w);
+    return computation_gc::intersect_circle(p, dist, p0, p1, w);
+}
+        
+bool autopilot_route_pi::Intersect(wp &p, double brg, wp &p0, wp &p1, wp &w)
+{
+    if(prefs.computation == preferences::MERCATOR)
+        return computation_mc::intersect(p, brg, p0, p1, w);
+    return computation_gc::intersect(p, brg, p0, p1, w);
+}
+
 void autopilot_route_pi::RequestRoute(wxString guid)
 {
-    wxJSONWriter w;
-    wxJSONValue v;
-    v["GUID"] = guid;
-    wxString out;
-    w.Write(v, out);
+    Json::FastWriter w;
+    Json::Value v;
+    v["GUID"] = std::string(guid);
     m_active_request_guid = guid;
-    SendPluginMessage("OCPN_ROUTE_REQUEST", out);
+    SendPluginMessage("OCPN_ROUTE_REQUEST", w.write(v));
 }
 
 void autopilot_route_pi::AdvanceWaypoint()
@@ -588,7 +695,7 @@ void autopilot_route_pi::AdvanceWaypoint()
 
         if(++it == m_route.end()) {
             // reached destination
-            SendPluginMessageEmpty("OCPN_RTE_ENDED");
+            SendPluginMessage("OCPN_RTE_ENDED", "");
             DeactivateRoute();
         }
         if(prefs.confirm_bearing_change) {
@@ -635,25 +742,25 @@ void autopilot_route_pi::UpdateWaypoint()
 
     m_next_route_wp_GUID = m_current_wp.GUID; // for total calculations
     if(m_last_wpt_activated_guid != m_current_wp.GUID) {
-        wxJSONWriter w;
-        wxJSONValue v;
-        v["GUID"] = m_last_wpt_activated_guid;
-        wxString out;
-        w.Write(v, out);
-        SendPluginMessage("OCPN_WPT_ACTIVATED", out);
+        Json::FastWriter w;
+        Json::Value v;
+        v["GUID"] = std::string(m_last_wpt_activated_guid);
+        SendPluginMessage("OCPN_WPT_ACTIVATED", w.write(v));
     }
 }
 
 double autopilot_route_pi::FindXTE()
 {
     // find a position along this bearing
-    double dlat, dlon, xte;
-    ll_gc_ll(m_current_wp.lat, m_current_wp.lon, m_current_wp.arrival_bearing, 1, &dlat, &dlon);
+    double dlat, dlon, brg, xte;
+    PositionBearing(m_current_wp.lat, m_current_wp.lon, m_current_wp.arrival_bearing, 1, &dlat, &dlon);
     wp b(m_lastfix.Lat, m_lastfix.Lon), w(dlat, dlon);
-    wp p = computation::closest(b, m_current_wp, w);
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, 0, &xte);
+    wp p = Closest(b, m_current_wp, w);
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, &brg, &xte);
     if(isnan(xte))
         xte = 0;
+    else if(heading_resolve(brg - m_current_wp.arrival_bearing) < 0)
+        xte = -xte;
     return xte;
 }    
 
@@ -662,42 +769,45 @@ void autopilot_route_pi::ComputeXTE()
     UpdateWaypoint();
 
     double xte = FindXTE();
-    m_xte_rate = xte - m_current_xte;
     m_current_xte = xte;
     
     m_current_bearing = m_current_wp.arrival_bearing;
-    m_current_xte = xte*prefs.xte_multiplier + m_xte_rate*prefs.xte_rate_multiplier;
+    m_current_xte = xte*prefs.xte_multiplier;
 }
 
 void autopilot_route_pi::ComputeWaypointBearing()
 {
     UpdateWaypoint();    
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
-                     &m_current_bearing, 0);
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon,
+                    m_current_wp.lat, m_current_wp.lon,
+                    &m_current_bearing, 0);
     m_current_xte = 0;
 }
 
 void autopilot_route_pi::ComputeRoutePositionBearing()
 {
     double dist, bearing;
-    // arrival radius only for final route point to deactivate route
-    waypoint &finish = *m_route.rbegin();
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, finish.lat, finish.lon,
-                     &bearing, &dist);
-
-    // if in the arrival radius for final route point or heading away, deactivate
-    m_bArrival = dist < finish.arrival_radius;
-    if(m_bArrival ||
-       fabs(heading_resolve(m_current_wp.arrival_bearing - bearing)) > 90) {
-        // reached destination
-        SendPluginMessageEmpty("OCPN_RTE_ENDED");
-        DeactivateRoute();
-    }
 
     // distance ahead to steer to
     dist = prefs.route_position_bearing_mode == preferences::TIME ?
         prefs.route_position_bearing_time*m_avg_sog/3600.0 :
         prefs.route_position_bearing_distance;
+
+    // arrival radius only for final route point to deactivate route
+    waypoint &finish = *m_route.rbegin();
+    double finish_dist;
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, finish.lat, finish.lon,
+                    &bearing, &finish_dist);
+
+    // if in the arrival radius for final route point or heading away, deactivate
+    m_bArrival = finish_dist * 1852.0 < dist;
+    if(m_bArrival ||
+       (m_current_wp.eq(finish) && fabs(heading_resolve(finish.arrival_bearing - bearing)) > 90)) {
+        // reached destination
+        SendPluginMessage("OCPN_RTE_ENDED", "");
+        DeactivateRoute();
+    }
+
     wp boat(m_lastfix.Lat, m_lastfix.Lon);
     
     // find optimal position
@@ -706,21 +816,20 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     wp p0 = *it, w;
     for(it++; it!=m_route.end(); it++) {
         wp p1 = *it;
-        if(computation::intersect_circle(boat, dist, p0, p1, w))
+        if(IntersectCircle(boat, dist, p0, p1, w))
             havew = true;
         p0 = p1;
     }
 
     if(!havew) {
-        // circle does not intersect route at all
         // find closest position in route to boat
         it = m_route.begin();
         p0 = *it;
         double best_dist = INFINITY;
         for(it++; it!=m_route.end(); it++) {
             waypoint p1 = *it;
-            wp x = computation::closest_seg(boat, p0, p1);
-            double dist = computation::distance(boat, x);
+            wp x = ClosestSeg(boat, p0, p1);
+            double dist = Distance(boat, x);
             if(dist < best_dist) {
                 best_dist = dist;
                 w = x;
@@ -735,7 +844,18 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     m_current_wp.lon = w.lon;
     m_current_wp.GUID = "";
 
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
+
+    // clamp to max angle
+    double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
+    double brg = m_current_wp.arrival_bearing;
+    double max_angle = prefs.route_position_bearing_max_angle;
+    if(ang > max_angle)
+        m_current_bearing = brg + max_angle;
+    else
+    if(ang < -max_angle)
+        m_current_bearing = brg - max_angle;
+        
     m_current_xte = 0;
 }
 
@@ -766,7 +886,7 @@ void autopilot_route_pi::SendRMB()
         fabs(m_current_wp.lon), m_current_wp.lon < 0 ? "W" : "E" );
 
     double brg, dist;
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
                      &brg, &dist);
     NMEA0183.Rmb.RangeToDestinationNauticalMiles = dist;
     NMEA0183.Rmb.BearingToDestinationDegreesTrue = brg;
@@ -834,7 +954,8 @@ void autopilot_route_pi::SendAPB()
     NMEA0183.Apb.BearingOriginToDestination = m_current_wp.arrival_bearing;
 
     double brg;
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &brg, 0);
+    DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &brg, 0);
+    
     NMEA0183.Apb.BearingPresentPositionToDestination = brg;
             
     NMEA0183.Apb.HeadingToSteer = m_current_bearing;

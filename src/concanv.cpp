@@ -34,6 +34,8 @@
   #include "wx/wx.h"
 #endif //precompiled headers
 
+#include <wx/aui/aui.h>
+
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
@@ -42,18 +44,11 @@
 #include "concanv.h"
 #include "georef.h"
 
-#if 0
-extern bool             g_bShowActiveRouteHighway;
-extern double           gCog;
-extern double           gSog;
-extern bool             g_bShowTrue, g_bShowMag;
-
-bool             g_bShowRouteTotal;
-#endif
 
 enum eMenuItems {
     ID_DEACTIVATE,
-    ID_PREFERENCES
+    ID_PREFERENCES,
+    ID_UNDOCK
 } menuItems;
 
 //------------------------------------------------------------------------------
@@ -65,23 +60,26 @@ BEGIN_EVENT_TABLE(ConsoleCanvas, wxWindow)
     EVT_CONTEXT_MENU(ConsoleCanvas::OnContextMenu)
     EVT_MENU(ID_DEACTIVATE, ConsoleCanvas::OnContextMenuSelection)
     EVT_MENU(ID_PREFERENCES, ConsoleCanvas::OnContextMenuSelection)
+    EVT_MENU(ID_UNDOCK, ConsoleCanvas::OnContextMenuSelection)
+    EVT_BUTTON(ID_DEACTIVATE, ConsoleCanvas::OnContextMenuSelection)
     
 END_EVENT_TABLE()
 
 // Define a constructor for my canvas
 ConsoleCanvas::ConsoleCanvas( wxWindow *frame, autopilot_route_pi &pi )
-: m_pi(pi)
+:         wxWindow( frame, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE,
+                    _T("Dashboard") ), m_pi(pi)
 {
     page = 0;
     pbackBrush = NULL;
     m_bNeedClear = false;
 
-    long style = wxSIMPLE_BORDER | wxCLIP_CHILDREN;
-#ifdef __WXOSX__
-    style |= wxSTAY_ON_TOP;
-#endif
+//    long style = wxBORDER_NONE;//0;//wxSIMPLE_BORDER | wxCLIP_CHILDREN;
+//#ifdef __WXOSX__
+//    style |= wxSTAY_ON_TOP;
+//#endif
 
-    wxDialog::Create( frame, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, style );
+//    wxDialog::Create( frame, wxID_ANY, _T(""), wxDefaultPosition, wxDefaultSize, style );
     
     m_pParent = frame;
 
@@ -124,25 +122,29 @@ ConsoleCanvas::ConsoleCanvas( wxWindow *frame, autopilot_route_pi &pi )
     m_pitemBoxSizerLeg->AddSpacer( 5 );
     m_pitemBoxSizerLeg->Add( pCDI, 0, wxALL | wxEXPAND, 2 );
 
+    // Deactivate button
+    pDeactivate = new wxButton( this, ID_DEACTIVATE, _("Deactivate") );
+    m_pitemBoxSizerLeg->Add( pDeactivate, 0, wxALL | wxEXPAND, 2 );
+
     SetSizer( m_pitemBoxSizerLeg );      // use the sizer for layout
     m_pitemBoxSizerLeg->SetSizeHints( this );
     Layout();
     Fit();
     
-    Hide();
+//    Hide();
 
     wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/Settings/AutopilotControl" ) );
+    pConf->SetPath ( _T( "/Settings/AutopilotRoute" ) );
 #ifdef __WXGTK__
-    Move(0, 0);        // workaround for gtk autocentre dialog behavior
+//    Move(0, 0);        // workaround for gtk autocentre dialog behavior
 #endif
-    Move(pConf->Read ( _T ( "ConsolePosX" ), 20L ), pConf->Read ( _T ( "ConsolePosY" ), 20L ));
+//    Move(pConf->Read ( _T ( "ConsolePosX" ), 20L ), pConf->Read ( _T ( "ConsolePosY" ), 20L ));
 }
 
 ConsoleCanvas::~ConsoleCanvas()
 {
     wxFileConfig *pConf = GetOCPNConfigObject();
-    pConf->SetPath ( _T( "/Settings/AutopilotControl" ) );
+    pConf->SetPath ( _T( "/Settings/AutopilotRoute" ) );
     wxPoint p = GetPosition();
     pConf->Write ( _T ( "ConsolePosX" ), p.x );
     pConf->Write ( _T ( "ConsolePosY" ), p.y );
@@ -195,6 +197,7 @@ void ConsoleCanvas::OnShow( wxShowEvent& event )
     pTRNG->Show(m_pi.prefs.ActiveRouteLabel(page, "Route RNG") );
     pTTTG->Show(m_pi.prefs.ActiveRouteLabel(page, "Route TTG") );
     pCDI->Show( m_pi.prefs.ActiveRouteLabel(page, "Highway") );
+    pDeactivate->Show( m_pi.prefs.ActiveRouteLabel(page, "Deactivate") );
 
     m_pitemBoxSizerLeg->SetSizeHints( this );
 }
@@ -203,8 +206,10 @@ void ConsoleCanvas::OnContextMenu( wxContextMenuEvent& event ) {
     wxMenu* contextMenu = new wxMenu();
     wxMenuItem* btnDeactivate = new wxMenuItem(contextMenu, ID_DEACTIVATE, _("Deactivate"), _T("") );
     wxMenuItem* btnPreferences = new wxMenuItem(contextMenu, ID_PREFERENCES, _("Preferences"), _T("") );
+    wxMenuItem* btnUndock = new wxMenuItem(contextMenu, ID_UNDOCK, _("Undock"), _T("") );
     contextMenu->Append( btnDeactivate );
     contextMenu->Append( btnPreferences );
+    contextMenu->Append( btnUndock );
 
     PopupMenu( contextMenu );
 
@@ -218,6 +223,10 @@ void ConsoleCanvas::OnContextMenuSelection( wxCommandEvent& event ) {
             break;
         case ID_PREFERENCES:
             m_pi.ShowPreferences();
+            break;
+        case ID_UNDOCK:
+            GetFrameAuiManager()->GetPane(this).Float();
+            GetFrameAuiManager()->Update();
             break;
     }
 }
@@ -364,11 +373,14 @@ void ConsoleCanvas::UpdateRouteData()
 void ConsoleCanvas::ShowWithFreshFonts( void )
 {
     Hide();
-//    Move( 0, 0 );
-
     UpdateFonts();
     Show();
 
+    wxSize sz = GetSize();
+    sz.y += 16; // hack for lack of better way to determine tilebar
+    GetFrameAuiManager()->GetPane(this).
+        FloatingSize(sz);
+    GetFrameAuiManager()->Update();
 }
 
 void ConsoleCanvas::UpdateFonts( void )
@@ -499,9 +511,6 @@ void AnnunText::RefreshFonts()
             m_val_color = m_default_text_color;
             
     }
-    
-        
-
 }
 
 void AnnunText::SetLegendElement( const wxString &element )
@@ -577,8 +586,10 @@ CDI::CDI( wxWindow *parent, wxWindowID id, long style, const wxString& name ) :
 
 void CDI::MouseEvent( wxMouseEvent& event )
 {
-#ifdef    __OCPN__ANDROID__
     if( event.RightDown() ) {
+#ifdef    __OCPN__ANDROID__
+//        qDebug() << "right down";
+         
         wxContextMenuEvent cevt;
         cevt.SetPosition( event.GetPosition());
         
@@ -586,8 +597,15 @@ void CDI::MouseEvent( wxMouseEvent& event )
         if(ccp)
             ccp->OnContextMenu( cevt );
         
-    }
 #endif    
+    }
+    else if( event.LeftDown() ) {
+        ConsoleCanvas *ccp = dynamic_cast<ConsoleCanvas*>(GetParent());
+        if(ccp){
+            ccp->page = !ccp->page;
+            ccp->ShowWithFreshFonts();
+        }
+    }
 }
 
 void CDI::SetColorScheme( PI_ColorScheme cs )

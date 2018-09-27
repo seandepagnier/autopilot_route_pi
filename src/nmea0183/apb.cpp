@@ -150,7 +150,7 @@ bool APB::Write( SENTENCE& sentence )
 
    sentence += IsLoranBlinkOK;
    sentence += IsLoranCCycleLockOK;
-   sentence.Add( CrossTrackErrorMagnitude, 1);
+   sentence.Add( CrossTrackErrorMagnitude, 3);
 
    if(DirectionToSteer == Left)
        sentence += _T("L");

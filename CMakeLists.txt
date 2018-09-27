@@ -27,12 +27,13 @@ SET(SRC_AUTOPILOT_ROUTE
             src/ODAPI.h
 	)
 
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOPILOT_ROUTE})
+
 INCLUDE("cmake/PluginNMEA.cmake")
 INCLUDE("cmake/PluginJSON.cmake")
 INCLUDE("cmake/PluginXML.cmake")
 INCLUDE("cmake/PluginGL.cmake")
 
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOPILOT_ROUTE} ${SRC_JSON} ${SRC_NMEA0183} ${SRC_TINYXML} ${SRC_PLUGINGL})
 
 INCLUDE("cmake/PluginInstall.cmake")
 INCLUDE("cmake/PluginLocalization.cmake")

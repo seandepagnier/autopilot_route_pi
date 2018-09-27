@@ -76,7 +76,7 @@ class waypoint : public wp {
 public:
     waypoint() {}
     waypoint(double lat, double lon) : wp(lat, lon) {}
-    waypoint(double lat, double lon, wxString name, wxString guid, double ar, double lat0, double lon0);
+    waypoint(double lat, double lon, wxString name, wxString guid, double ar, double ab);
 
     wxString name, GUID;
     double arrival_radius;
@@ -124,13 +124,14 @@ public:
         wxString mode;
 
         // Standard XTE
-        double xte_multiplier, xte_rate_multiplier;
+        double xte_multiplier;
 
         // Waypoint Bearing
 
         // Route Position Bearing
         enum RoutePositionBearingMode {DISTANCE, TIME} route_position_bearing_mode;
         double route_position_bearing_distance, route_position_bearing_time;
+        double route_position_bearing_max_angle;
 
         // Active Route Window
         std::map<wxString, bool> active_route_labels[2];
@@ -142,6 +143,8 @@ public:
 
         // Waypoint Arrival
         bool confirm_bearing_change;
+        bool intercept_route;
+        enum ComputationType { GREAT_CIRCLE, MERCATOR } computation;
 
         // Boundary
         wxString boundary_guid;
@@ -172,6 +175,7 @@ protected:
     PlugIn_Position_Fix_Ex m_lastfix;
 
 private:
+    void Recompute();
     void SetCursorLatLon(double lat, double lon);
     void SetNMEASentence(wxString &sentence);
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
@@ -179,6 +183,15 @@ private:
 
     void RearrangeWindow();
 
+    void PositionBearing(double lat0, double lon0, double brg, double dist, double *dlat, double *dlon);
+    void DistanceBearing(double lat0, double lon0, double lat1, double lon1, double *bearing, double *dist);
+
+    wp Closest(wp &p, wp &p0, wp &p1);
+    wp ClosestSeg(wp &p, wp &p0, wp &p1);
+    double Distance(wp &p0, wp &p1);
+    bool IntersectCircle(wp &p, double dist, wp &p0, wp &p1, wp &w);
+    bool Intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w);
+    
     void RequestRoute(wxString guid);
     void AdvanceWaypoint();
     void UpdateWaypoint();
@@ -217,15 +230,8 @@ private:
     bool m_bArrival;
 
     double m_current_bearing, m_current_xte;
-    // for xte mode
-    double m_xte_rate;
 
-    // for xte boundary mode
-    
-    // for bearing mode
-    
     // optimum route mode variables
-
     double m_avg_sog;
 };
 
