@@ -15,6 +15,7 @@ ENDIF (COMMAND cmake_policy)
 
 MESSAGE (STATUS "*** Staging to build ${PACKAGE_NAME} ***")
 
+include  ("VERSION.cmake")
 configure_file(cmake/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 configure_file(cmake/wxWTranslateCatalog.h.in ${PROJECT_SOURCE_DIR}/src/wxWTranslateCatalog.h)
 
