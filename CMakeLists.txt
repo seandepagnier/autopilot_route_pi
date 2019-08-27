@@ -31,7 +31,7 @@ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOPILOT_ROUTE})
 
 INCLUDE("cmake/PluginNMEA.cmake")
 INCLUDE("cmake/PluginJSON.cmake")
-INCLUDE("cmake/PluginGL.cmake")
+#INCLUDE("cmake/PluginGL.cmake")
 
 
 INCLUDE("cmake/PluginInstall.cmake")
