@@ -124,7 +124,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 IF(NOT DEFINED wxWidgets_USE_FILE)
-  SET(wxWidgets_USE_LIBS base core net xml html adv)
+  SET(wxWidgets_USE_LIBS base core net xml html adv aui)
 ENDIF(NOT DEFINED wxWidgets_USE_FILE)
 
 
