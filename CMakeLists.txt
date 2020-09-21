@@ -54,7 +54,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "6")
+set(VERSION_TWEAK "7")
 set(VERSION_DATE "09/21/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -186,7 +186,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/tinyxml)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp/json)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/GL)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/GL)
 
 ##
 ## ----- Change above to match project requirements ----- ##

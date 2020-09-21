@@ -23,7 +23,7 @@ endif(UNIX)
 
 message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/GL) added for watchdog
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/GL) #added for watchdog
 
 ADD_LIBRARY(${PACKAGE_NAME}_LIB_PLUGINGL STATIC ${SRC_PLUGINGL})
 
