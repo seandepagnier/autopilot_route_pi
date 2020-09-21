@@ -2,7 +2,22 @@
 ## Author:      Sean D'Epagnier
 ## Copyright:   
 ## License:     GPLv3+
-##---------------------------------------------------------------------------
+### *   This program is free software; you can redistribute it and/or modify  *
+## *   it under the terms of the GNU General Public License as published by  *
+## *   the Free Software Foundation; either version 2 of the License, or     *
+## *   (at your option) any later version.                                   *
+## *                                                                         *
+## *   This program is distributed in the hope that it will be useful,       *
+## *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+## *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+## *   GNU General Public License for more details.                          *
+## *                                                                         *
+## *   You should have received a copy of the GNU General Public License     *
+## *   along with this program; if not, write to the                         *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
+## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
+## ***
+#-----------------------------------------------------------------------------
 # Frontend2 Author: Jon Gough  
 # Frontend2: v1.0.137.0
 # ---------------------------------------------------------------------------
@@ -15,6 +30,7 @@
 
 set(CMLOC "CMakeLists: ")
 
+# define minimum cmake version
 cmake_minimum_required(VERSION 3.1.1)
 if(COMMAND cmake_policy)
     if(POLICY CMP0043)
@@ -38,7 +54,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "5")
+set(VERSION_TWEAK "6")
 set(VERSION_DATE "09/21/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -53,7 +69,8 @@ set(PARENT "opencpn")
 
 #No longer needed, queried.
 #set(GIT_USER "rgleason")
-#set(GIT_REPOSITORY_NAME "testplugin_pi")
+#set(GIT_USER "seandepagnier")							  
+#set(GIT_REPOSITORY_NAME "autopilot_plugin_pi")
 
 # Specifies Cloudsmith upload repository suffix for each catalog
 set(PROD "prod")    #Standard Repos
@@ -66,7 +83,7 @@ set(CLOUDSMITH_USER "opencpn")
 
 # Set if yourCloudsmith Base Repository name does not match your Git Repository name.
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins") #Rick's customization
-set (CLOUDSMITH_BASE_REPOSITORY "autopilot-route")  #without the pi
+set (CLOUDSMITH_BASE_REPOSITORY "autopilot-route")  #without "pi" and "-" instead of "_"
 
 set(XML_INFO_URL "https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:safety:odraw1.6_pi")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
@@ -155,6 +172,8 @@ SET(SRCS
 			api-16/ocpn_plugin.h
 	)
 
+
+add_definitions(-DPLUGIN_USE_SVG)
 ##
 # Modify/configure 'Include' Directories below for the Plugin
 ##
@@ -171,7 +190,10 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/tinyxml)
 
 ##
 ## ----- Change above to match project requirements ----- ##
-
+#needed only if glshim project is included.
+if(QT_ANDROID)
+  target_link_libraries(${PACKAGE_NAME}  GL_static)
+endif(QT_ANDROID)  
 ##
 ## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
 ## This add_library  can be used in conditionals below.
@@ -182,6 +204,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/tinyxml)
  ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
 ##==========================================================================
 #  ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOPILOT_ROUTE})
+
+add_definitions(-DTIXML_USE_STL)
 
 #IF(UNIX)
 # INCLUDE("cmake/FindTinyXML.cmake")
@@ -223,8 +247,8 @@ INCLUDE("PluginPackage")
 ##=======================================
 
 #from wxroute
-get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
-message(STATUS "${CMLOC}Libraries: ${OUT}")
+#get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
+#message(STATUS "${CMLOC}Libraries: ${OUT}")
 
 ##
 ## ----- do not change section above - needed to configure build process ----- ##
