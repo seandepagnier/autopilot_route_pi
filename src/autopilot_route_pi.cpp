@@ -76,7 +76,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_111(ppimgr)
+    : opencpn_plugin_116(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -215,12 +215,12 @@ bool autopilot_route_pi::DeInit(void)
 
 int autopilot_route_pi::GetAPIVersionMajor()
 {
-    return MY_API_VERSION_MAJOR;
+    return OCPN_API_VERSION_MAJOR;
 }
 
 int autopilot_route_pi::GetAPIVersionMinor()
 {
-    return MY_API_VERSION_MINOR;
+    return OCPN_API_VERSION_MINOR;
 }
 
 int autopilot_route_pi::GetPlugInVersionMajor()
@@ -240,17 +240,20 @@ wxBitmap *autopilot_route_pi::GetPlugInBitmap()
 
 wxString autopilot_route_pi::GetCommonName()
 {
-    return _("Autopilot Route");
+    return _T(PLUGIN_COMMON_NAME);
+//    return _("Autopilot Route");
 }
 
 wxString autopilot_route_pi::GetShortDescription()
 {
-    return _("Autopilot Route PlugIn for OpenCPN");
+    return _(PLUGIN_SHORT_DESCRIPTION);
+//    return _("Autopilot Route PlugIn for OpenCPN");
 }
 
 wxString autopilot_route_pi::GetLongDescription()
 {
-    return _("Autopilot Route PlugIn for OpenCPN\n\
+    return _(PLUGIN_LONG_DESCRIPTION); 
+    // return _("Autopilot Route PlugIn for OpenCPN\n\
 Configurable Autopilot Route following abilities.");
 }
 

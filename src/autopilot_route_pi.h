@@ -34,9 +34,6 @@
 #include "version.h"
 #include "wxWTranslateCatalog.h"
 
-#define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    11
-
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
 #define OPC wxS("opencpn-autopilot_route_pi")
@@ -86,7 +83,7 @@ public:
 typedef std::list<waypoint> ap_route;
 typedef std::list<waypoint>::iterator ap_route_iterator;
 
-class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_111
+class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_116
 {
     friend ConsoleCanvas;
 public:
