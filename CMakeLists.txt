@@ -54,7 +54,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "12")
+set(VERSION_TWEAK "13")
 set(VERSION_DATE "09/24/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -93,8 +93,6 @@ set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 ## ----- Modify section above to include all the details for your plugin ----- ##
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
-
-# SET(CMAKE_MACOSX_RPATH "ON")
 
 option(PLUGIN_USE_SVG "Use SVG graphics" OFF)
 
@@ -150,7 +148,7 @@ include("PluginConfigure")
 ## ----- Change below to match project requirements for source, headers, etc. ----- ##
 #
 
-add_definitions(-DUSE_S57)
+#add_definitions(-DUSE_S57)
 
 #IF(PLUGIN_USE_SVG)
 #    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
@@ -193,13 +191,18 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp/json)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 
 
 ##
 ## ----- Change above to match project requirements ----- ##
 
+## These are NOT used in Testplugin, used for other plugins
+##=======================================
+INCLUDE("PluginJSON")
+INCLUDE("PluginGL")   #not needed in earlier version
+INCLUDE("PluginNMEA")
+##=======================================
 
 ##
 ## Statement below is required to collect all the set( headers and SRCS  - Adjust as required
@@ -209,7 +212,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 ##
 ##==========================================================================
 # ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_NMEA0183} ${SRC_JSON} ${SRC_PLUGINGL} )
 #ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_JSON} ${SRC_PLUGINGL})
 ##==========================================================================
 
@@ -247,15 +250,9 @@ add_definitions(-DTIXML_USE_STL)
 
 
 
-add_definitions(-DPLUGIN_USE_SVG)
+# add_definitions(-DPLUGIN_USE_SVG)
 
 
-## These are NOT used in Testplugin, used for other plugins
-##=======================================
-INCLUDE("PluginNMEA")
-INCLUDE("PluginJSON")
-INCLUDE("PluginGL")
-##=======================================
 
 ## ----- do not change next section - needed to configure build process ----- ##
 ##
