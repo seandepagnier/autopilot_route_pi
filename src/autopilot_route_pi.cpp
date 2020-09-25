@@ -38,6 +38,7 @@ v *   along with this program; if not, write to the                         *
 
 #include "autopilot_route_pi.h"
 #include "concanv.h"
+
 #include "PreferencesDialog.h"
 #include "icons.h"
 
