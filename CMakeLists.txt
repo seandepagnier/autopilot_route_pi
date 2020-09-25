@@ -54,8 +54,8 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "9")
-set(VERSION_DATE "09/21/2020")
+set(VERSION_TWEAK "11")
+set(VERSION_DATE "09/24/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -152,12 +152,12 @@ include("PluginConfigure")
 
 add_definitions(-DUSE_S57)
 
-IF(PLUGIN_USE_SVG)
-    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
-    IF(NOT QT_ANDROID)
-        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
-    ENDIF(NOT QT_ANDROID)
-ENDIF(PLUGIN_USE_SVG)
+#IF(PLUGIN_USE_SVG)
+#    MESSAGE(STATUS "${CMLOC}SVG support enabled...")
+#    IF(NOT QT_ANDROID)
+#        ADD_DEFINITIONS(-DPLUGIN_USE_SVG)
+#    ENDIF(NOT QT_ANDROID)
+#ENDIF(PLUGIN_USE_SVG)
 
 SET(SRCS
             src/autopilot_route_pi.cpp
@@ -207,9 +207,10 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
 ## SET(EXTSRC  ${EXTSRC}   etc   Can be in an if statement as below
 ##
 ##==========================================================================
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
+# ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
+ ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_JSON} ${SRC_PLUGINGL})
 ##==========================================================================
-#  ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOPILOT_ROUTE})
+
 
 #needed only if glshim project is included.
 if(QT_ANDROID)
