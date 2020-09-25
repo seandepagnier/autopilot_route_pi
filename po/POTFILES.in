@@ -1,0 +1,10 @@
+src/autopilot_route_pi.cpp
+src/autopilot_route_pi.cpp
+src/PreferencesDialog.cpp
+src/AutopilotRouteUI.cpp
+src/concanv.cpp
+src/computation.cpp
+src/georef.c
+src/icons.cpp
+src/ODAPI.h
+api-16/ocpn_plugin.h
