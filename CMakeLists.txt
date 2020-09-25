@@ -54,7 +54,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "11")
+set(VERSION_TWEAK "12")
 set(VERSION_DATE "09/24/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -193,7 +193,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/jsoncpp/json)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include/GL)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 
 
 ##
@@ -208,7 +209,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/api-16)
 ##
 ##==========================================================================
 # ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
- ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_JSON} ${SRC_PLUGINGL})
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS})
+#ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_JSON} ${SRC_PLUGINGL})
 ##==========================================================================
 
 
