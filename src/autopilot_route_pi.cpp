@@ -27,6 +27,7 @@ v *   along with this program; if not, write to the                         *
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
+#include "math.h"
 
 #include "plugingl/pidc.h"
 
