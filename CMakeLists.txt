@@ -54,8 +54,8 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
 set(VERSION_PATCH "0")
-set(VERSION_TWEAK "14")
-set(VERSION_DATE "09/25/2020")
+set(VERSION_TWEAK "15")
+set(VERSION_DATE "10/03/2020")
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -167,8 +167,26 @@ SET(SRCS
             src/georef.c
             src/icons.cpp
             src/ODAPI.h
-			api-16/ocpn_plugin.h
+
 	)
+
+SET(HDRS
+            src/PreferencesDialog.h
+			src/msvcdefs.h
+			src/icons.h
+			src/georef.h
+			src/georef.c
+            src/conanv.h
+            src/computation.h
+			src/AutopilotRouteUI.h
+            src/autopilot_route_pi.h
+			src/wxWTranslateCatalog.h
+			api-16/ocpn_plugin.h
+    )			
+
+#set(EXTSRC)
+#set(EXTINCLUDE extinclude/nlohmann/json.hpp extinclude/ODAPI.h)
+#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 #added for android  from pypilot
 set(LIBHDRS
@@ -176,8 +194,12 @@ set(LIBHDRS
     libs/GL/gl_private.h
     libs/GL/glext.h
     libs/GL/glu.h
-)
-
+#    libs/wx/include/wx/json_defs.h
+#    libs/wx/include/wx/jsonreader.h
+#    libs/wx/include/wx/jsonval.h
+#    libs/wx/include/wx/jsonwriter.h
+	)
+	
 add_definitions(-DPLUGIN_USE_SVG)
 ##
 # Modify/configure 'Include' Directories below for the Plugin
@@ -212,7 +234,7 @@ INCLUDE("PluginNMEA")
 ##
 ##==========================================================================
 # ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS})
-ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_NMEA0183} ${SRC_JSON} ${SRC_PLUGINGL} )
+ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${HDRRS} ${LIBHDRS} ${SRC_NMEA0183} ${SRC_JSON} ${SRC_PLUGINGL} )
 #ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRCS} ${LIBHDRS} ${SRC_JSON} ${SRC_PLUGINGL})
 ##==========================================================================
 

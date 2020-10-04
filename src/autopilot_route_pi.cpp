@@ -254,8 +254,7 @@ wxString autopilot_route_pi::GetShortDescription()
 wxString autopilot_route_pi::GetLongDescription()
 {
     return _(PLUGIN_LONG_DESCRIPTION); 
-    // return _("Autopilot Route PlugIn for OpenCPN\n\
-Configurable Autopilot Route following abilities.");
+//    return _("Autopilot Route PlugIn for OpenCPN Configurable Autopilot Route following abilities.");
 }
 
 void autopilot_route_pi::SetColorScheme(PI_ColorScheme cs)
