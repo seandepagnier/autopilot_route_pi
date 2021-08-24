@@ -1,4 +1,4 @@
 name: autopilot_route
-title: autopilot_route
+title: Autopilot Route Plugin
 version: '0.1'
 start_page: ROOT:autopilot_route.adoc 
