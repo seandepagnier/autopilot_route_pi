@@ -1,7 +1,7 @@
 site:
   title: Autopilot Route Plugin Manual
   url:  https://nowhere.net
-  start_page: autopilot_route:ROOT:autopilot_route.adoc
+  start_page: autopilot_route:ROOT:index.adoc
 
 content:
   sources:
