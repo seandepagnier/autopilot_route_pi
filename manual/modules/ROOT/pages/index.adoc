@@ -137,6 +137,5 @@ connection in opencpn.
 
 * Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github
 (Raspberry Pi Autopilot)] also same author
-* Manual:
-https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:supplementary_hardware:screens&s%5B%5D=pypilot#pypilot_autopilot[Pypilot
+* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc#_pypilot_autopilot[Pypilot
 Opencpn Manual]
