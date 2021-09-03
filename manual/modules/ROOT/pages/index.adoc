@@ -1,8 +1,8 @@
 :imagesdir: ../images/
 
-== AutoPilot Route
+= AutoPilot Route
 
-=== Aim
+== Aim
 
 Provide Configurable Autopilot Route following abilities for OpenCPN.
 
@@ -16,7 +16,7 @@ for computing how this sentence is generated. It does output a
 continuously changing bearing in some modes which is no problem for
 pypilot, but some autopilots might not allow it.
 
-=== Links
+== Links
 
 * Source: https://github.com/seandepagnier/autopilot_route_pi[Github
 Source] by Sean Depagnier
@@ -60,7 +60,7 @@ menu, it's settings are controlled from the preferences menu.
 
 image:autopilot_route.png[]
 
-=== Douwe Fokkema advises:
+== Douwe Fokkema advises:
 
 * There is a proprietary PGN that allows setting the heading of the
 Raymarine EV-1 pilot when it is in auto mode. This is PGN 126208 with a
@@ -77,13 +77,13 @@ the above will set a heading of 91 degrees.
 * This is tested with canboat and a Actisense NGT-1 and functions
 flawless.
 
-=== Sean Advises:
+== Sean Advises:
 
 The autopilot route plugin could easily be extended to emit this
 message. I cannot really implement it because I have no way of testing
 it.
 
-==== Autopilot Connection from Windows via USB
+=== Autopilot Connection from Windows via USB
 
 NMEA is a serial connection using the RS422 physical layer. While the
 'S' in 'USB' does stand for serial it is an entirely different serial
@@ -102,14 +102,14 @@ There are lots of other options, including adding a WiFi dongle to your
 Raymarine that means you don't have to use wires, but those get more
 complicated.
 
-=== FAQ
+== FAQ
 
-==== How to ‘pair’ Autopilot_Route _pi with Pypilot?
+=== How to ‘pair’ Autopilot_Route _pi with Pypilot?
 
 Pypilot works well itself. Autopilot_Route works itself and shows the
 right overlay but does not direct pypilot in any gps or compass mode.
 
-==== It looks like we have to find how to direct nmea output from autopilot to signalk. Could somebody share how one would use autopilot with pypilot or pypilot motor controller?
+=== It looks like we have to find how to direct nmea output from autopilot to signalk. Could somebody share how one would use autopilot with pypilot or pypilot motor controller?
 
 The Autopilot_Route Plugin is not specific to Pypilot or any other
 autopilot. It replaces the nmea APB output built into opencpn with many
@@ -133,7 +133,7 @@ Signalk which makes it easier to change the autopilot host (if you have
 more than one, for example) without needing to add or change the
 connection in opencpn.
 
-==== RPI Pypilot Links
+=== RPI Pypilot Links
 
 * Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github
 (Raspberry Pi Autopilot)] also same author
