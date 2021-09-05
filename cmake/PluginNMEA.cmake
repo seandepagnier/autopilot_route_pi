@@ -16,9 +16,6 @@ SET(SRC_NMEA0183
     src/nmea0183/hexvalue.cpp
     src/nmea0183/lat.cpp
     src/nmea0183/expid.cpp
-    src/nmea0183/apb.cpp
-    src/nmea0183/xte.cpp
-    src/nmea0183/GPwpl.cpp
     src/nmea0183/wpl.cpp
     src/nmea0183/rte.cpp
     src/nmea0183/hdt.cpp
@@ -28,5 +25,28 @@ SET(SRC_NMEA0183
     src/nmea0183/vtg.cpp
     src/nmea0183/gga.cpp
     src/nmea0183/gsv.cpp
+    src/nmea0183/xte.cpp
+    src/nmea0183/apb.cpp
+#    src/nmea0183/dbt.cpp
+#    src/nmea0183/dpt.cpp
+#    src/nmea0183/mtw.cpp
+#    src/nmea0183/mwv.cpp
+#    src/nmea0183/vhw.cpp
+#    src/nmea0183/vwr.cpp
+#    src/nmea0183/zda.cpp
+#    src/nmea0183/rsa.cpp
+#    src/nmea0183/mwd.cpp
+#    src/nmea0183/vwt.cpp
+    src/nmea0183/GPwpl.cpp
+#    src/nmea0183/mta.cpp
+#    src/nmea0183/vlw.cpp
+#    src/nmea0183/mda.cpp
 )
-INCLUDE_DIRECTORIES(src/nmea0183)
+
+message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
+
+ADD_LIBRARY(${PACKAGE_NAME}_LIB_PLUGINNMEA0183 STATIC ${SRC_NMEA0183})
+
+#TARGET_LINK_LIBRARIES( ${PACKAGE_NAME} ${PACKAGE_NAME}_LIB_PLUGINNMEA0183 )
+#message(STATUS "Add Library LIB_PLUGINNEMA0183")  

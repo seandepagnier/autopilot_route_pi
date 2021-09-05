@@ -28,7 +28,7 @@ v *   along with this program; if not, write to the                         *
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
 
-#include "apdc.h"
+#include "plugingl/pidc.h"
 
 #include "json/json.h"
 
@@ -38,6 +38,7 @@ v *   along with this program; if not, write to the                         *
 
 #include "autopilot_route_pi.h"
 #include "concanv.h"
+
 #include "PreferencesDialog.h"
 #include "icons.h"
 
@@ -76,7 +77,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_110(ppimgr)
+    : opencpn_plugin_116(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -215,12 +216,12 @@ bool autopilot_route_pi::DeInit(void)
 
 int autopilot_route_pi::GetAPIVersionMajor()
 {
-    return MY_API_VERSION_MAJOR;
+    return OCPN_API_VERSION_MAJOR;
 }
 
 int autopilot_route_pi::GetAPIVersionMinor()
 {
-    return MY_API_VERSION_MINOR;
+    return OCPN_API_VERSION_MINOR;
 }
 
 int autopilot_route_pi::GetPlugInVersionMajor()
@@ -240,18 +241,20 @@ wxBitmap *autopilot_route_pi::GetPlugInBitmap()
 
 wxString autopilot_route_pi::GetCommonName()
 {
-    return _("Autopilot Route");
+    return _T(PLUGIN_COMMON_NAME);
+//    return _("Autopilot Route");
 }
 
 wxString autopilot_route_pi::GetShortDescription()
 {
-    return _("Autopilot Route PlugIn for OpenCPN");
+    return _(PLUGIN_SHORT_DESCRIPTION);
+//    return _("Autopilot Route PlugIn for OpenCPN");
 }
 
 wxString autopilot_route_pi::GetLongDescription()
 {
-    return _("Autopilot Route PlugIn for OpenCPN\n\
-Configurable Autopilot Route following abilities.");
+    return _(PLUGIN_LONG_DESCRIPTION); 
+//    return _("Autopilot Route PlugIn for OpenCPN Configurable Autopilot Route following abilities.");
 }
 
 void autopilot_route_pi::SetColorScheme(PI_ColorScheme cs)
@@ -274,14 +277,14 @@ void autopilot_route_pi::ShowPreferencesDialog( wxWindow* parent )
 
 bool autopilot_route_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp)
 {
-    apDC odc(dc);
+    piDC odc(dc);
     Render(odc, *vp);
     return true;
 }
 
 bool autopilot_route_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp)
 {
-    apDC odc;
+    piDC odc;
     glEnable( GL_BLEND );
     Render(odc, *vp);
     glDisable( GL_BLEND );
@@ -410,7 +413,7 @@ void autopilot_route_pi::DeactivateRoute()
     SendPluginMessage("OCPN_RTE_DEACTIVATED", "");
 }
 
-void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
 {
     if(m_active_guid.IsEmpty())
         return;
@@ -427,7 +430,7 @@ void autopilot_route_pi::Render(apDC &dc, PlugIn_ViewPort &vp)
     dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
-void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::RenderArrivalWaypoint(piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint r1, r2;
     dc.SetPen(wxPen(*wxGREEN, 2));
@@ -450,7 +453,7 @@ void autopilot_route_pi::RenderArrivalWaypoint(apDC &dc, PlugIn_ViewPort &vp)
     dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
-void autopilot_route_pi::RenderRoutePositionBearing(apDC &dc, PlugIn_ViewPort &vp)
+void autopilot_route_pi::RenderRoutePositionBearing(piDC &dc, PlugIn_ViewPort &vp)
 {
     wxPoint r1;
     dc.SetPen(wxPen(*wxGREEN, 2));

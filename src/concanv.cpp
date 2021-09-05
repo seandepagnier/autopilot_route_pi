@@ -588,7 +588,7 @@ void CDI::MouseEvent( wxMouseEvent& event )
 {
     if( event.RightDown() ) {
 #ifdef    __OCPN__ANDROID__
-        qDebug() << "right down";
+//        qDebug() << "right down";
          
         wxContextMenuEvent cevt;
         cevt.SetPosition( event.GetPosition());
