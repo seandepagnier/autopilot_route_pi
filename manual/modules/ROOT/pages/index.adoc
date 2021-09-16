@@ -20,33 +20,34 @@ pypilot, but some autopilots might not allow it.
 
 * Source: https://github.com/seandepagnier/autopilot_route_pi[Github
 Source] by Sean Depagnier
+* Maintenance Source: https://github.com/rgleaon/autopilot_route_pi
 * Releases:
 https://github.com/seandepagnier/autopilot_route_pi/releases[Autopilot_route_pi
 Pre-Release]
-* Releases for Windows:
-https://github.com/rgleason/autopilot_route_pi/releases[Autopilot_route_pi
-Pre-Release for Windows]
-* Forum:
-http://www.cruisersforum.com/forums/f134/autopilot-route-plugin-197566.html[Autopilot_Route_pi
-Cruisers Forum Thread]
-* Forum:
-http://www.cruisersforum.com/forums/f134/autopilot-control-196347.html[Another
-CF thread re AP Control]
-* Video: The autopilot route plugin capable of steering under sail in
-harbors https://youtu.be/KQuBwLSMSxI[Pypilot on Princess Mia]
+* Releases for Windows: https://github.com/rgleason/autopilot_route_pi/releases[Autopilot_route_pi Pre-Release for Windows]
+* Forum: http://www.cruisersforum.com/forums/f134/autopilot-route-plugin-197566.html[Autopilot_Route_pi Cruisers Forum Thread]
+* Forum: http://www.cruisersforum.com/forums/f134/autopilot-control-196347.html[Another CF thread re AP Control]
+* Video: The autopilot route plugin capable of steering under sail in harbors https://youtu.be/KQuBwLSMSxI[Pypilot on Princess Mia]
+
 
 The autopilot route plugin is capable of steering under sail in harbors.
 This plugin is used in Sean's video of a heavy steel sailboat with a
 windshield wiper motor driving the wheel and Autopilot_Route_pi
 directing the motor: https://youtu.be/KQuBwLSMSxI
 
-Modes:
+== Installation
+
+Pypilot Autopilot is available as a managed plugin (PIM), which is the easiest way to install the plugin. The OpenCPN Manual has general information in xref:openpcn-plugins:misc:plugin-install.adoc[Plugin Download, Install and Enable] for installing this plugin. This is the preferred way.
+
+In OpenCPN, go to the Options → Plugins and download, install and enable the Watchdog plugin.
+
+== Modes:
 
 . Route Position Bearing
 . Standard Cross Track XTE -XTE multiplier
 . Waypoint Bearing -by Distance or by Time
 
-Options
+== Options
 
 . Confirm Bearing change on Waypoint Arrival.
 . Intercept Route on Current Course
@@ -135,7 +136,6 @@ connection in opencpn.
 
 === RPI Pypilot Links
 
-* Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github
-(Raspberry Pi Autopilot)] also same author
-* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc#_pypilot_autopilot[Pypilot
-Opencpn Manual]
+* Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github (Raspberry Pi Autopilot)] also same author
+* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot
+
