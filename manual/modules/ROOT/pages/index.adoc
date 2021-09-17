@@ -134,7 +134,7 @@ Signalk which makes it easier to change the autopilot host (if you have
 more than one, for example) without needing to add or change the
 connection in opencpn.
 
-=== RPI Pypilot Links
+== RPI Pypilot Links
 
 * Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github (Raspberry Pi Autopilot)] also same author
 * Manual: xref:openpcn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot"
