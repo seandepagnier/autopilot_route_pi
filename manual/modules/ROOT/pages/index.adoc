@@ -108,7 +108,9 @@ complicated.
 Pypilot works well itself. Autopilot_Route works itself and shows the
 right overlay but does not direct pypilot in any gps or compass mode.
 
-=== It looks like we have to find how to direct nmea output from autopilot to signalk. Could somebody share how one would use autopilot with pypilot or pypilot motor controller?
+=== How to direct nmea output from autopilot to signalk. 
+
+Could somebody share how one would use autopilot with pypilot or pypilot motor controller?
 
 The Autopilot_Route Plugin is not specific to Pypilot or any other
 autopilot. It replaces the nmea APB output built into opencpn with many
