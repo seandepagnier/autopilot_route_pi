@@ -21,25 +21,23 @@ pypilot, but some autopilots might not allow it.
 * Source: https://github.com/seandepagnier/autopilot_route_pi[Github
 Source] by Sean Depagnier
 * Maintenance Source: https://github.com/rgleaon/autopilot_route_pi
-* Releases:
-https://github.com/seandepagnier/autopilot_route_pi/releases[Autopilot_route_pi
-Pre-Release]
-* Releases for Windows: https://github.com/rgleason/autopilot_route_pi/releases[Autopilot_route_pi Pre-Release for Windows]
+* Installation Instructions: xref:opencpn-plugins:misc:plugin-install.adoc[Plugin Download, Install and Enable]
+* Legacy Downloads: https://github.com/seandepagnier/autopilot_route_pi/releases[Autopilot_route_pi]
+* Legacy Downloads for Windows: https://github.com/rgleason/autopilot_route_pi/releases[Autopilot_route_pi for Windows]
 * Forum: http://www.cruisersforum.com/forums/f134/autopilot-route-plugin-197566.html[Autopilot_Route_pi Cruisers Forum Thread]
 * Forum: http://www.cruisersforum.com/forums/f134/autopilot-control-196347.html[Another CF thread re AP Control]
 * Video: The autopilot route plugin capable of steering under sail in harbors https://youtu.be/KQuBwLSMSxI[Pypilot on Princess Mia]
 
+== Purpose 
 
-The autopilot route plugin is capable of steering under sail in harbors.
-This plugin is used in Sean's video of a heavy steel sailboat with a
-windshield wiper motor driving the wheel and Autopilot_Route_pi
+The autopilot route plugin is capable of steering under sail in harbors. This plugin is used in Sean's video of a heavy steel sailboat with a windshield wiper motor driving the wheel and Autopilot_Route_pi
 directing the motor: https://youtu.be/KQuBwLSMSxI
 
 == Installation
 
-Pypilot Autopilot is available as a managed plugin (PIM), which is the easiest way to install the plugin. The OpenCPN Manual has general information in xref:openpcn-plugins:misc:plugin-install.adoc[Plugin Download, Install and Enable] for installing this plugin. This is the preferred way.
+Pypilot Autopilot is available as a managed plugin (PIM), which is the easiest way to install the plugin. The OpenCPN Manual has general Installation Instructions: xref:opencpn-plugins:misc:plugin-install.adoc[Plugin Download, Install and Enable] for installing this plugin. This is the preferred way.
 
-In OpenCPN, go to the Options → Plugins and download, install and enable the Watchdog plugin.
+In OpenCPN, go to the _Options → Plugins_ and download, install and enable the Autopilot_Route plugin.
 
 == Modes:
 
@@ -137,5 +135,5 @@ connection in opencpn.
 === RPI Pypilot Links
 
 * Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github (Raspberry Pi Autopilot)] also same author
-* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot
+* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot"
 
