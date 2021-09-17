@@ -39,7 +39,7 @@ Pypilot Autopilot is available as a managed plugin (PIM), which is the easiest w
 
 In OpenCPN, go to the _Options → Plugins_ and download, install and enable the Autopilot_Route plugin.
 
-== Modes:
+== Modes
 
 . Route Position Bearing
 . Standard Cross Track XTE -XTE multiplier
@@ -59,7 +59,7 @@ menu, it's settings are controlled from the preferences menu.
 
 image:autopilot_route.png[]
 
-== Douwe Fokkema advises:
+== Douwe advises:
 
 * There is a proprietary PGN that allows setting the heading of the
 Raymarine EV-1 pilot when it is in auto mode. This is PGN 126208 with a
@@ -82,7 +82,7 @@ The autopilot route plugin could easily be extended to emit this
 message. I cannot really implement it because I have no way of testing
 it.
 
-=== Autopilot Connection from Windows via USB
+=== AP Windows Connection via USB
 
 NMEA is a serial connection using the RS422 physical layer. While the
 'S' in 'USB' does stand for serial it is an entirely different serial
@@ -108,9 +108,9 @@ complicated.
 Pypilot works well itself. Autopilot_Route works itself and shows the
 right overlay but does not direct pypilot in any gps or compass mode.
 
-=== How to direct nmea output from autopilot to signalk. 
+=== How to direct nmea output from autopilot to signalk? 
 
-Could somebody share how one would use autopilot with pypilot or pypilot motor controller?
+How does one use autopilot with pypilot or pypilot motor controller?
 
 The Autopilot_Route Plugin is not specific to Pypilot or any other
 autopilot. It replaces the nmea APB output built into opencpn with many
