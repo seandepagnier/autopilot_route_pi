@@ -137,5 +137,5 @@ connection in opencpn.
 == RPI Pypilot Links
 
 * Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github (Raspberry Pi Autopilot)] also same author
-* Manual: xref:openpcn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot"
+* Manual: xref::opencpn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot"
 
