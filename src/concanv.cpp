@@ -307,7 +307,7 @@ void ConsoleCanvas::UpdateRouteData()
         waypoint &wp = *it;
         if( n_addflag ) {
             double dist;
-            ll_gc_ll_reverse(lat0, lon0, wp.lat, wp.lon, 0, &dist);
+            APR_ll_gc_ll_reverse(lat0, lon0, wp.lat, wp.lon, 0, &dist);
             trng += dist;
         }
         lat0 = wp.lat, lon0 = wp.lon;

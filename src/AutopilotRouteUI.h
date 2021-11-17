@@ -1,12 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Feb 20 2018)
+// C++ code generated with wxFormBuilder (version 3.9.0 Sep 12 2020)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
 ///////////////////////////////////////////////////////////////////////////
 
-#ifndef __AUTOPILOTROUTEUI_H__
-#define __AUTOPILOTROUTEUI_H__
+#pragma once
 
 #include <wx/artprov.h>
 #include <wx/xrc/xmlres.h>
@@ -27,6 +26,9 @@
 #include <wx/checklst.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
 #include <wx/dialog.h>
 
 #include "wxWTranslateCatalog.h"
@@ -37,10 +39,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class PreferencesDialogBase
 ///////////////////////////////////////////////////////////////////////////////
-class PreferencesDialogBase : public wxDialog 
+class PreferencesDialogBase : public wxDialog
 {
 	private:
-	
+
 	protected:
 		wxChoicebook* m_cbMode;
 		wxPanel* m_panel5;
@@ -69,7 +71,6 @@ class PreferencesDialogBase : public wxDialog
 		wxSpinCtrl* m_sBoundaryWidth;
 		wxStaticText* m_staticText72;
 		wxCheckBox* m_cbConfirmBearingChange;
-		wxCheckBox* m_cbInterceptRoute;
 		wxChoice* m_cComputation;
 		wxCheckListBox* m_cbActiveRouteItems0;
 		wxCheckListBox* m_cbActiveRouteItems1;
@@ -77,18 +78,17 @@ class PreferencesDialogBase : public wxDialog
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
-		
+
 		// Virtual event handlers, overide them in your derived class
 		virtual void OnMode( wxChoicebookEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOk( wxCommandEvent& event ) { event.Skip(); }
-		
-	
+
+
 	public:
-		
-		PreferencesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Autopilot Route Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL ); 
+
+		PreferencesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Autopilot Route Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 		~PreferencesDialogBase();
-	
+
 };
 
-#endif //__AUTOPILOTROUTEUI_H__

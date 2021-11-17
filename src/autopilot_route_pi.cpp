@@ -18,7 +18,7 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
-v *   along with this program; if not, write to the                         *
+ *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
@@ -108,7 +108,7 @@ int autopilot_route_pi::Init(void)
         pConf->Read("RoutePositionBearingMode", 0L);
     p.route_position_bearing_distance = pConf->Read("RoutePositionBearingDistance", 100);
     p.route_position_bearing_time = pConf->Read("RoutePositionBearingTime", 100);
-    p.route_position_bearing_max_angle = pConf->Read("RoutePositionBearingMaxAngle", 30);
+    p.route_position_bearing_max_angle = pConf->Read("RoutePositionBearingMaxAngle", 20);
     
     // Active Route Window
     wxString labels[2] = {pConf->Read("ActiveRouteItems0", "XTE;BRG;RNG;TTG;VMG;Highway;Deactivate;"),
@@ -122,7 +122,6 @@ int autopilot_route_pi::Init(void)
 
     // options
     p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
-    p.intercept_route = (bool)pConf->Read("InterceptRoute", 1L);
     p.computation = pConf->Read("Computation", "Great Circle") == "Mercator" ? preferences::MERCATOR : preferences::GREAT_CIRCLE;
 
     // Boundary
@@ -193,7 +192,6 @@ bool autopilot_route_pi::DeInit(void)
     }
     // Waypoint Arrival
     pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
-    pConf->Write("InterceptRoute", p.intercept_route);
     pConf->Write("Computation", p.computation == preferences::MERCATOR ? "Mercator" : "Great Circle");
 
     // Boundary
@@ -578,43 +576,6 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
             lat0 = lat, lon0 = lon;
         }
         
-        // add interception points
-        if(prefs.intercept_route) {
-            ap_route_iterator it = m_route.begin(), closest;
-            wp p0 = *it;
-            wp boat(m_lastfix.Lat, m_lastfix.Lon);
-            double mindist = INFINITY;
-            // find closest segment
-            for(it++; it!=m_route.end(); it++) {
-                waypoint p1 = *it;
-                wp x = ClosestSeg(boat, p0, p1);
-                double dist = Distance(boat, x);
-                if(dist < mindist) {
-                    mindist = dist;
-                    closest = it;
-                }
-                p0 = p1;
-            }
-            
-            // do we intersect this segment on current course?
-            wp p1 = *closest, w;
-            closest--;
-            p0 = *closest;
-            // insert boat position after p0
-            double brg;
-            DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
-            waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
-            m_route.insert(closest, boat_wp);
-            
-            // if intersect, insert this position
-            if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
-                double brg;
-                DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
-                                                                                                              closest->arrival_radius, brg);
-                m_route.insert(closest, i);
-            }
-        }
-        
         m_current_wp.GUID = "";
         Recompute();
         m_Timer.Start(1000/prefs.rate);
@@ -637,9 +598,9 @@ void autopilot_route_pi::PositionBearing(double lat0, double lon0, double brg, d
 void autopilot_route_pi::DistanceBearing(double lat0, double lon0, double lat1, double lon1, double *brg, double *dist)
 {
     if(prefs.computation == preferences::MERCATOR)
-        DistanceBearingMercator_Plugin(lat0, lon0, lat1, lon1, brg, dist);
+        APR_DistanceBearingMercator(lat0, lon0, lat1, lon1, brg, dist);
     else
-        ll_gc_ll_reverse(lat0, lon0, lat1, lon1, brg, dist);
+        APR_ll_gc_ll_reverse(lat0, lon0, lat1, lon1, brg, dist);
 }
 
 
@@ -721,7 +682,7 @@ void autopilot_route_pi::UpdateWaypoint()
         // activate nearest waypoint
         double mindist = INFINITY;
         for(ap_route_iterator it=m_route.begin(); it!=m_route.end(); it++) {
-            ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, it->lat, it->lon, 0, &dist);
+            APR_ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, it->lat, it->lon, 0, &dist);
             if(dist < mindist) {
                 m_current_wp = *it;
                 mindist = dist;
@@ -729,7 +690,7 @@ void autopilot_route_pi::UpdateWaypoint()
         }
     }
 
-    ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
+    APR_ll_gc_ll_reverse(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon,
                      &bearing, &dist);
 
     // if in the arrival radius, advance
@@ -816,8 +777,11 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     wp p0 = *it, w;
     for(it++; it!=m_route.end(); it++) {
         wp p1 = *it;
-        if(IntersectCircle(boat, dist, p0, p1, w))
+        if(IntersectCircle(boat, dist, p0, p1, w)) {
             havew = true;
+            DistanceBearing(p0.lat, p0.lon, p1.lat, p1.lon,
+                            &m_current_wp.arrival_bearing, 0);
+        }
         p0 = p1;
     }
 
@@ -834,6 +798,8 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
                 best_dist = dist;
                 w = x;
                 m_next_route_wp_GUID = p1.GUID; // for total calculations
+                DistanceBearing(p0.lat, p0.lon, p1.lat, p1.lon,
+                                &m_current_wp.arrival_bearing, 0);
             }
             p0 = p1;
         }
@@ -843,7 +809,6 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     m_current_wp.lat = w.lat;
     m_current_wp.lon = w.lon;
     m_current_wp.GUID = "";
-
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
 
     // clamp to max angle
@@ -855,7 +820,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     else
     if(ang < -max_angle)
         m_current_bearing = brg - max_angle;
-        
+
     m_current_xte = 0;
 }
 

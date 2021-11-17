@@ -259,7 +259,7 @@ wp closest_seg(wp &p, wp &p0, wp &p1)
 double distance(wp &p0, wp &p1)
 {
     double dist;
-    DistanceBearingMercator(p0.lat, p0.lon, p1.lat, p1.lon, 0, &dist);
+    APR_DistanceBearingMercator(p0.lat, p0.lon, p1.lat, p1.lon, 0, &dist);
     return dist;
 }
 
