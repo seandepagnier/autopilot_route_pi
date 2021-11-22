@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "0")
-set(VERSION_TWEAK "33")
-set(VERSION_DATE "04/11/2021") # DD/MM/YYYY format
+set(VERSION_PATCH "1")
+set(VERSION_TWEAK "0")
+set(VERSION_DATE "21/11/2021") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")

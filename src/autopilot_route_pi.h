@@ -101,6 +101,8 @@ public:
     wxString GetCommonName();
     wxString GetShortDescription();
     wxString GetLongDescription();
+    // from shipdriver to read listing panel bitmap png
+	wxBitmap m_panelBitmap; 
 
     void SetColorScheme(PI_ColorScheme cs);
     void ShowPreferencesDialog( wxWindow* parent );

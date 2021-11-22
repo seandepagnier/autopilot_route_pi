@@ -85,6 +85,31 @@ autopilot_route_pi::autopilot_route_pi(void *ppimgr)
     m_PreferencesDialog = NULL;
     m_avg_sog=0;
     m_declination = NAN;
+	
+// Create the PlugIn icons  -from shipdriver
+// loads png file for the listing panel icon
+    wxFileName fn;
+    auto path = GetPluginDataDir("autopilot_route_pi");
+    fn.SetPath(path);
+    fn.AppendDir("data");
+    fn.SetFullName("ap_route_panel.png");
+
+    path = fn.GetFullPath();
+
+    wxInitAllImageHandlers();
+
+    wxLogDebug(wxString("Using icon path: ") + path);
+    if (!wxImage::CanRead(path)) {
+        wxLogDebug("Initiating image handlers.");
+        wxInitAllImageHandlers();
+    }
+    wxImage panelIcon(path);
+    if (panelIcon.IsOk())
+        m_panelBitmap = wxBitmap(panelIcon);
+    else
+        wxLogWarning("Autopilot_Route panel icon has NOT been loaded");
+// End of from Shipdriver	
+	
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -234,10 +259,16 @@ int autopilot_route_pi::GetPlugInVersionMinor()
     return PLUGIN_VERSION_MINOR;
 }
 
-wxBitmap *autopilot_route_pi::GetPlugInBitmap()
-{
-    return new wxBitmap(_img_autopilot_route->ConvertToImage().Copy());
-}
+//  Converts  icon.cpp file to an image. Original process
+//wxBitmap *autopilot_route_pi::GetPlugInBitmap()
+//{
+//    return new wxBitmap(_img_autopilot_route->ConvertToImage().Copy());
+//}
+
+// Shipdriver uses the climatology_panel.png file to make the bitmap.
+wxBitmap *autopilot_route_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
+// End of shipdriver process
+
 
 wxString autopilot_route_pi::GetCommonName()
 {
