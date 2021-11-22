@@ -32,7 +32,7 @@ v *   along with this program; if not, write to the                         *
 
 #include "json/json.h"
 
-#include "nmea0183/nmea0183.h"
+#include "nmea0183.h"
 
 #include "georef.h"
 

@@ -12,9 +12,8 @@ src/msvcdefs.h
 src/icons.h
 src/georef.h
 src/georef.c
-src/conanv.h
+src/concanv.h
 src/computation.h
 src/AutopilotRouteUI.h
 src/autopilot_route_pi.h
 src/wxWTranslateCatalog.h
-api-16/ocpn_plugin.h
