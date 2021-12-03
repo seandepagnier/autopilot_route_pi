@@ -170,6 +170,8 @@ bool autopilot_route_pi::DeInit(void)
         pConf->Write("PosX", p.x);
         pConf->Write("PosY", p.y);
     }
+    wxAuiManager *pauimgr = GetFrameAuiManager();
+    pauimgr->DetachPane(m_ConsoleCanvas);
     delete m_ConsoleCanvas;
    
     preferences &p = prefs;
