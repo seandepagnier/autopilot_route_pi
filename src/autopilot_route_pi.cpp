@@ -471,8 +471,11 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
         return;
 
     // for now poll active route (not efficient)
-    if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10)
+    if((wxDateTime::Now() - m_active_request_time).GetSeconds() > 10) {
         RequestRoute(m_active_guid);
+        if(m_active_guid.IsEmpty())
+            return;
+    }
     
     Recompute();
 
