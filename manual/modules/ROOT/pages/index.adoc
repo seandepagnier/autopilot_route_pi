@@ -6,15 +6,32 @@
 
 Provide Configurable Autopilot Route following abilities for OpenCPN.
 
+Please note that Autopilot_Route does output a continuously changing 
+bearing in some modes, which is no problem for pypilot, but some 
+autopilots might not allow it. Also this plugin has only been tested with
+pypilot at this point in time. If you are using it with other autopilots
+please advise regarding your experience.
+
 The autopilot route plugin (beta) is a completely separate plugin to be
 used with any autopilot. It allows you to use different algorithms and
 closely tune them for route following logic. It has nothing specific to
 pypilot. This plugin allows the user to select different algorithms and
 closely tune them for route following logic. The autopilot route plugin
 replaces the nmea APB output built into opencpn with many more options
-for computing how this sentence is generated. It does output a
-continuously changing bearing in some modes which is no problem for
-pypilot, but some autopilots might not allow it.
+for computing how this sentence is generated. 
+
+. The autopilot route plugin outputs a continuously changing bearing in
+some modes always with xte of 0 (because xte is not used) so the
+autopilot must accept this and not require confirmation for it to work.
+. To make Pypilot follow routes from either Opencpn without the
+autopilot route plugin or with it is the same. You need to make tcp
+connection from Opencpn to Pypilot port 20220 with “output on this port”
+checked.
+. The latest version of the Pypilot Plugin can automatically send nmea
+sentences to port 20220 on whatever host it connects to Pypilot for
+Signalk which makes it easier to change the autopilot host (if you have
+more than one, for example) without needing to add or change the
+connection in opencpn.
 
 == Links
 
@@ -120,21 +137,10 @@ for Pypilot, but some autopilots might not allow it.
 . I didn't try other autopilots with the route plugin, but apparently
 some autopilots require confirmation on bearing change. So the apb must
 give the same bearing always and only after xte.
-. The autopilot route plugin outputs a continuously changing bearing in
-some modes always with xte of 0 (because xte is not used) so the
-autopilot must accept this and not require confirmation for it to work.
-. To make Pypilot follow routes from either Opencpn without the
-autopilot route plugin or with it is the same. You need to make tcp
-connection from Opencpn to Pypilot port 20220 with “output on this port”
-checked.
-. The latest version of the Pypilot Plugin can automatically send nmea
-sentences to port 20220 on whatever host it connects to Pypilot for
-Signalk which makes it easier to change the autopilot host (if you have
-more than one, for example) without needing to add or change the
-connection in opencpn.
+
 
 == RPI Pypilot Links
 
-* Source: https://github.com/seandepagnier/rpi_autopilot[PyPilot Github (Raspberry Pi Autopilot)] also same author
+* Source: https://github.com/pypilot/[PyPilot Github (Raspberry Pi Autopilot)] also same author
 * Manual: xref:opencpn-plugins:misc:rpi-setups.adoc[RPI Pypilot Opencpn] Go down to the bottom "Pypilot Autopilot"
 
