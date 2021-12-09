@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 ## ***
 # ---------------------------------------------------------------------------
-# Testplugin Template: v1.0.180.0   Author: Jon Gough
+# Testplugin Template: v1.0.185.0 08/12/2021  Author: Jon Gough
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur    ----- ##
 ## ----- Changes should only be made between the section blocks that identify where ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "1")
+set(VERSION_PATCH "2")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "21/11/2021") # DD/MM/YYYY format
+set(VERSION_DATE "09/12/2021") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -64,27 +64,20 @@ set(OCPN_API_VERSION_MINOR "16")
 set(PARENT "opencpn")
 
 # The next line allows setup of a local webserver with git for testing purposes.
-# The default is shown below, but it is done in cmake/pluginconfigure.cmake now.
-# This default is needed to build locally and to build flatpak.
 #set(GIT_REPOSITORY_SERVER "github.com")
-
-#No longer needed, queried.
-#set(GIT_USER "rgleason")
-#set(GIT_USER "seandepagnier")							  
-#set(GIT_REPOSITORY_NAME "autopilot_plugin_pi")
 
 # Specifies Cloudsmith upload repository suffix for each catalog
 set(PROD "prod")    #Standard Repos
 set(BETA "beta")    #Standard Repos
 set(ALPHA "alpha")  #Standard Repos
 
-#set(CLOUDSMITH_USER "jon-gough")
-#set(CLOUDSMITH_USER "rick-gleason")
-set(CLOUDSMITH_USER "opencpn")
-
 # Set if yourCloudsmith Base Repository name does not match your Git Repository name.
 #set(CLOUDSMITH_BASE_REPOSITORY "opencpn-plugins") #Rick's customization
 set (CLOUDSMITH_BASE_REPOSITORY "autopilot-route")  #without "pi" and "-" instead of "_"
+
+set(CLOUDSMITH_USER "opencpn")
+#set(CLOUDSMITH_USER "rick-gleason")
+
 
 set(XML_INFO_URL "https://opencpn.org/wiki/dokuwiki/doku.php?id=opencpn:opencpn_user_manual:plugins:safety:odraw1.6_pi")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
@@ -120,6 +113,7 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 ##
 
 project(${PACKAGE})
+
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 ##=======================================
@@ -130,7 +124,7 @@ include("PluginSetup")
 ## ----- Modify section below if there are special requirements for the plugin ----- ##
 ##
 
-set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE "Activate verbose mode for make files" ON)
 
 option(Plugin_CXX11 "Use c++11" OFF)
 
@@ -149,8 +143,6 @@ include("PluginConfigure")
 #
 
 #add_definitions(-DUSE_S57)
-
-
 
 SET(SRCS
     src/autopilot_route_pi.cpp
@@ -210,7 +202,7 @@ set(LIBHDRS
 	
 add_definitions(-DPLUGIN_USE_SVG)
 
-#set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
+set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 
 #
 # ----- If using JSON validation in plugin section below is needed ----- ##
@@ -235,7 +227,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
 # All from tesplugin v1.0.180
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
@@ -274,9 +266,11 @@ INCLUDE("PluginGL")   #not needed in earlier version
 ## This add_library  can be used in conditionals below.
 ##
 # target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
-#target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${LIBHDRS} ${SRC_NMEA0183} ${SRC_JSON} ${SRC_PLUGINGL})
+target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${LIBHDRS} ${SRC_NMEA0183} ${SRC_JSON} ${SRC_PLUGINGL})
 
-target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${LIBHDRS}  ${SRC_PLUGINGL})
+#try
+#target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${LIBHDRS}  ${SRC_PLUGINGL} ${OCPNSRC})
+
 
 if(NOT OCPN_FLATPAK_CONFIG)
     # Build environment not available when flatpak is being configured so following statements will not work
