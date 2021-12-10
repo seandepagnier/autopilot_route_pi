@@ -791,7 +791,7 @@ double autopilot_route_pi::FindXTE()
     wp b(m_lastfix.Lat, m_lastfix.Lon), w(dlat, dlon);
     wp p = Closest(b, m_current_wp, w);
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, &brg, &xte);
-    if(isnan(xte))
+    if(wxIsNaN(xte))
         xte = 0;
     else if(heading_resolve(brg - m_current_wp.arrival_bearing) < 0)
         xte = -xte;
