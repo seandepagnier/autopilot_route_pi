@@ -352,7 +352,7 @@ void ConsoleCanvas::UpdateRouteData()
 
     if (VMG > 0.) {
         // Show date, e.g. Feb 15, if TTG > 24 h
-        seta = tttg_sec > SECONDS_PER_DAY ?
+        seta = (tttg_sec > SECONDS_PER_DAY) ?
             eta.Format(_T("%b %d %H:%M")) : eta.Format(_T("%H:%M"));
     } else {
         seta = _T("---");

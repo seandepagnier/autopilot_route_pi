@@ -56,6 +56,9 @@ SET(SRC
     src/mwv.hpp
 
 )
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+  
 if (NOT wxWidgets_INCLUDE_DIRS)
     include(SimpleWxConfig)
     SimpleWxConfig()
