@@ -1,4 +1,11 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 2.6)
+
+if (TARGET ocpn::glu_static)
+    return ()
+endif ()
+
+set(SAVE_CMLOC_GLU ${CMLOC})
+set(CMLOC "CMakeLists_GLU: ")
 
 project(glu)
 
@@ -17,12 +24,16 @@ IF (NOT WIN32 AND NOT APPLE)
   ADD_DEFINITIONS( " -g -fno-strict-aliasing -O2")
 ENDIF(NOT WIN32 AND NOT APPLE)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 IF(QT_ANDROID)
   ADD_DEFINITIONS( " -fPIC")
 ENDIF(QT_ANDROID)
 
-INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
-INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_SOURCE_DIR}/libs)
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+#INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/include)
+#INCLUDE_DIRECTORIES(include)
+
 
 IF(CMAKE_HOST_WIN32)
     IF(MSVC)
@@ -59,5 +70,21 @@ SET(GLU_SOURCES
     )
 
 add_library(GLU_static STATIC ${GLU_SOURCES})
-add_library(glu_static::glu_static ALIAS GLU_static)
+add_library(ocpn::glu_static ALIAS GLU_static)
 set_target_properties(GLU_static PROPERTIES OUTPUT_NAME GLU)
+
+#target_include_directories(GLU_static BEFORE
+#PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+#PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/gdal
+#PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+#  )
+message(STATUS "${CMLOC}CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}, CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+get_property(
+    dirs
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+    message(STATUS "${CMLOC}include dir='${dir}'")
+endforeach()
+
+set(CMLOC ${SAVE_CMLOC_GLU})

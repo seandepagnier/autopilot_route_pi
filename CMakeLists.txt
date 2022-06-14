@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 ## ***
 # ---------------------------------------------------------------------------
-# Testplugin Template: v1.0.185.0 08/12/2021  Author: Jon Gough
+# Testplugin Template: v1.0.211.0 06/13/2022  Author: Jon Gough
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur    ----- ##
 ## ----- Changes should only be made between the section blocks that identify where ----- ##
@@ -54,9 +54,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "4")
+set(VERSION_PATCH "5")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE "10/12/2021") # DD/MM/YYYY format
+set(VERSION_DATE "13/06/2022") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -146,7 +146,6 @@ include("PluginConfigure")
 
 SET(SRCS
     src/autopilot_route_pi.cpp
-    src/autopilot_route_pi.cpp
     src/PreferencesDialog.cpp
     src/AutopilotRouteUI.cpp
     src/concanv.cpp
@@ -228,7 +227,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183) 

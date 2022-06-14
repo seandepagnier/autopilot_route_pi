@@ -1,5 +1,4 @@
 src/autopilot_route_pi.cpp
-src/autopilot_route_pi.cpp
 src/PreferencesDialog.cpp
 src/AutopilotRouteUI.cpp
 src/concanv.cpp

@@ -18,7 +18,7 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
-v *   along with this program; if not, write to the                         *
+ *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,  USA.         *
  ***************************************************************************
@@ -458,6 +458,13 @@ void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
     GetCanvasPixLL(&vp, &r1, m_current_wp.lat, m_current_wp.lon);
     GetCanvasPixLL(&vp, &r2, m_lastfix.Lat, m_lastfix.Lon);
     dc.SetPen(wxPen(*wxRED, 2));
+
+    #if 1
+    double r = hypot(r1.x-r2.x, r1.y-r2.y);
+    r1.x = r2.x+r*sin(m_current_bearing*M_PI/180);
+    r1.y = r2.y-r*cos(m_current_bearing*M_PI/180);
+    #endif
+    
     dc.DrawLine(r1.x, r1.y, r2.x, r2.y);
 }
 
