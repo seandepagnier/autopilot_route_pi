@@ -34,8 +34,8 @@
 #include "version.h"
 #include "wxWTranslateCatalog.h"
 
-#define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    11
+// #define     MY_API_VERSION_MAJOR    1
+// #define     MY_API_VERSION_MINOR    11
 
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
 
@@ -86,7 +86,8 @@ public:
 typedef std::list<waypoint> ap_route;
 typedef std::list<waypoint>::iterator ap_route_iterator;
 
-class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_111
+//could be opencpn_plugin_116
+class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_116
 {
     friend ConsoleCanvas;
 public:
@@ -104,6 +105,8 @@ public:
     wxString GetCommonName();
     wxString GetShortDescription();
     wxString GetLongDescription();
+    // from shipdriver to read listing panel bitmap png
+	wxBitmap m_panelBitmap; 
 
     void SetColorScheme(PI_ColorScheme cs);
     void ShowPreferencesDialog( wxWindow* parent );
