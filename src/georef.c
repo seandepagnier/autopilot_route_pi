@@ -996,7 +996,7 @@ void ll_gc_ll(double lat, double lon, double brg, double dist, double *dlat, dou
     *dlon = lam2 / DEGREE;
 }
 
-void ll_gc_ll_reverse(double lat1, double lon1, double lat2, double lon2,
+void APR_ll_gc_ll_reverse(double lat1, double lon1, double lat2, double lon2,
                      double *bearing, double *dist)
 {
 // double th1,costh1,sinth1,sina12,cosa12,M,N,c1,c2,D,P,s1;
@@ -1207,7 +1207,7 @@ double DistGreatCircle(double slat, double slon, double dlat, double dlon)
 }
 
 
-void DistanceBearingMercator(double lat0, double lon0, double lat1, double lon1, double *brg, double *dist)
+void APR_DistanceBearingMercator(double lat1, double lon1, double lat0, double lon0, double *brg, double *dist)
 {
       double east, north, brgt, C;
       double lon0x, lon1x, dlat;

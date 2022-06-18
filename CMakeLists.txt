@@ -54,8 +54,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "5")
-set(VERSION_TWEAK "1")
+set(VERSION_PATCH "6")
+set(VERSION_TWEAK "3")
+
 set(VERSION_DATE "17/06/2022") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -127,8 +128,6 @@ include("PluginSetup")
 set(CMAKE_VERBOSE_MAKEFILE "Activate verbose mode for make files" ON)
 
 option(Plugin_CXX11 "Use c++11" OFF)
-
-#--- For Weatherfax insert Portaudio Section here  
 
 ##
 ## ----- Modify section above if there are special requirements for the plugin ----- ##

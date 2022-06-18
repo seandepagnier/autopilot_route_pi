@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version 3.10.1-0-g8feb16b3)
+// C++ code generated with wxFormBuilder (version 3.9.0 Sep 12 2020)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -71,7 +71,6 @@ class PreferencesDialogBase : public wxDialog
 		wxSpinCtrl* m_sBoundaryWidth;
 		wxStaticText* m_staticText72;
 		wxCheckBox* m_cbConfirmBearingChange;
-		wxCheckBox* m_cbInterceptRoute;
 		wxChoice* m_cComputation;
 		wxCheckListBox* m_cbActiveRouteItems0;
 		wxCheckListBox* m_cbActiveRouteItems1;
@@ -80,7 +79,7 @@ class PreferencesDialogBase : public wxDialog
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
 
-		// Virtual event handlers, override them in your derived class
+		// Virtual event handlers, overide them in your derived class
 		virtual void OnMode( wxChoicebookEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOk( wxCommandEvent& event ) { event.Skip(); }

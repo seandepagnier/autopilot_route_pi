@@ -32,7 +32,7 @@
 
 #include "json/json.h"
 
-#include "nmea0183.h"
+#include "nmea0183/nmea0183.h"
 
 #include "georef.h"
 
@@ -891,7 +891,6 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     m_current_wp.lat = w.lat;
     m_current_wp.lon = w.lon;
     m_current_wp.GUID = "";
-
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
 
     // clamp to max angle
@@ -903,7 +902,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
     else
     if(ang < -max_angle)
         m_current_bearing = brg - max_angle;
-        
+
     m_current_xte = 0;
 }
 
