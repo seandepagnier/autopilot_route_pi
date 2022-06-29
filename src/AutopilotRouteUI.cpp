@@ -62,7 +62,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_panel5->SetSizer( fgSizer44 );
 	m_panel5->Layout();
 	fgSizer44->Fit( m_panel5 );
-	m_cbMode->AddPage( m_panel5, _("Standard XTE"), false );
+	m_cbMode->AddPage( m_panel5, _("Standard XTE"), true );
 	m_panel8 = new wxPanel( m_cbMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer50;
 	fgSizer50 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -88,6 +88,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer19->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
 	m_sRoutePositionBearingDistance = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 100,-1 ), wxSP_ARROW_KEYS, 1, 1000, 100 );
+
 	fgSizer19->Add( m_sRoutePositionBearingDistance, 0, wxALL, 5 );
 
 	m_staticText74 = new wxStaticText( m_panel91, wxID_ANY, _("Meters"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -130,7 +131,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_panel9->SetSizer( fgSizer51 );
 	m_panel9->Layout();
 	fgSizer51->Fit( m_panel9 );
-	m_cbMode->AddPage( m_panel9, _("Route Position Bearing"), true );
+	m_cbMode->AddPage( m_panel9, _("Route Position Bearing"), false );
 	fgSizer37->Add( m_cbMode, 1, wxEXPAND | wxALL, 5 );
 
 
@@ -219,6 +220,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer56->Add( m_staticText71, 0, wxALL, 5 );
 
 	m_sBoundaryWidth = new wxSpinCtrl( sbSizer9->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 1000, 30 );
+
 	fgSizer56->Add( m_sBoundaryWidth, 0, wxALL, 5 );
 
 	m_staticText72 = new wxStaticText( sbSizer9->GetStaticBox(), wxID_ANY, _("M"), wxDefaultPosition, wxDefaultSize, 0 );
