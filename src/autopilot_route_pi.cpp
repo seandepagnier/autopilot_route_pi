@@ -968,7 +968,7 @@ void autopilot_route_pi::SendRMC()
     NMEA0183.Rmc.SpeedOverGroundKnots = m_lastfix.Sog;
     NMEA0183.Rmc.TrackMadeGoodDegreesTrue = m_lastfix.Cog;
 
-    if( !wxIsNaN(m_lastfix.Var) ) {
+    if( !isnan(m_lastfix.Var) ) {
         NMEA0183.Rmc.MagneticVariation = fabs(m_lastfix.Var);
         NMEA0183.Rmc.MagneticVariationDirection = m_lastfix.Var < 0. ? West : East;
     } else
@@ -1012,7 +1012,7 @@ void autopilot_route_pi::SendAPB()
     NMEA0183.Apb.BearingPresentPositionToDestination = brg;
             
     NMEA0183.Apb.HeadingToSteer = m_current_bearing;
-    if( prefs.magnetic && !wxIsNaN(m_declination) ) {
+    if( prefs.magnetic && !isnan(m_declination) ) {
         NMEA0183.Apb.BearingOriginToDestinationUnits = _T("M");
         NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("M");
         NMEA0183.Apb.HeadingToSteerUnits = _T("M");
