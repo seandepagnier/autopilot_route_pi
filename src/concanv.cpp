@@ -249,7 +249,7 @@ void ConsoleCanvas::UpdateRouteData()
     // VMG is always to next waypoint, not to end of route
     // VMG is SOG x cosine (difference between COG and BRG to Waypoint)
     double VMG = 0.;
-    if( !wxIsNaN(cog) && !wxIsNaN(sog) )
+    if( !isnan(cog) && !isnan(sog) )
     {
         VMG = sog * cos( ( brg - cog ) * M_PI / 180. ) ;
         str_buf.Printf( _T("%6.2f"), toUsrSpeed_Plugin( VMG ) );
@@ -288,7 +288,7 @@ void ConsoleCanvas::UpdateRouteData()
     // In all cases, ttg/eta are declared invalid if VMG <= 0.
     // If showing only "this leg", use VMG for calculation of ttg
     wxString ttg_s;
-    if( ( VMG > 0. ) && !wxIsNaN(cog) && !wxIsNaN(sog) ) {
+    if( ( VMG > 0. ) && !isnan(cog) && !isnan(sog) ) {
         float ttg_sec = ( rng / VMG ) * 3600.;
         wxTimeSpan ttg_span( 0, 0, long( ttg_sec ), 0 );
         ttg_s = ttg_span.Format();

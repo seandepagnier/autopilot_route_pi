@@ -148,7 +148,7 @@ int autopilot_route_pi::Init(void)
 
     // options
     p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
-    p.intercept_route = (bool)pConf->Read("InterceptRoute", 1L);
+//    p.intercept_route = (bool)pConf->Read("InterceptRoute", 1L);
     p.computation = pConf->Read("Computation", "Great Circle") == "Mercator" ? preferences::MERCATOR : preferences::GREAT_CIRCLE;
 
     // Boundary
@@ -622,42 +622,43 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
         }
         
         // add interception points
-        if(prefs.intercept_route) {
-            ap_route_iterator it = m_route.begin(), closest;
-            wp p0 = *it;
-            wp boat(m_lastfix.Lat, m_lastfix.Lon);
-            double mindist = INFINITY;
-            // find closest segment
-            for(it++; it!=m_route.end(); it++) {
-                waypoint p1 = *it;
-                wp x = ClosestSeg(boat, p0, p1);
-                double dist = Distance(boat, x);
-                if(dist < mindist) {
-                    mindist = dist;
-                    closest = it;
-                }
-                p0 = p1;
-            }
-            
-            // do we intersect this segment on current course?
-            wp p1 = *closest, w;
-            closest--;
-            p0 = *closest;
-            // insert boat position after p0
-            double brg;
-            DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
-            waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
-            m_route.insert(closest, boat_wp);
-            
-            // if intersect, insert this position
-            if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
-                double brg;
-                DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
-                                                                                                              closest->arrival_radius, brg);
-                m_route.insert(closest, i);
-            }
-        }
-        
+// Take out to match Sean 098226d
+//        if(prefs.intercept_route) {
+//            ap_route_iterator it = m_route.begin(), closest;
+//            wp p0 = *it;
+//            wp boat(m_lastfix.Lat, m_lastfix.Lon);
+//            double mindist = INFINITY;
+//            // find closest segment
+//            for(it++; it!=m_route.end(); it++) {
+//                waypoint p1 = *it;
+//                wp x = ClosestSeg(boat, p0, p1);
+//                double dist = Distance(boat, x);
+//                if(dist < mindist) {
+//                    mindist = dist;
+//                    closest = it;
+//                }
+//                p0 = p1;
+//            }
+//            
+//            // do we intersect this segment on current course?
+//            wp p1 = *closest, w;
+//            closest--;
+//            p0 = *closest;
+//            // insert boat position after p0
+//            double brg;
+//            DistanceBearing(boat.lat, boat.lon, p0.lat, p0.lon, &brg, 0);
+//            waypoint boat_wp(boat.lat, boat.lon, "boat", "", 0, brg);
+//            m_route.insert(closest, boat_wp);
+//            
+//            // if intersect, insert this position
+//            if(Intersect(boat, m_lastfix.Cog, p0, p1, w)) {
+//                double brg;
+//                DistanceBearing(w.lat, w.lon, boat.lat, boat.lon, &brg, 0);                        waypoint i(w.lat, w.lon, "intersection", "",
+//                                                                                                              closest->arrival_radius, brg);
+//                m_route.insert(closest, i);
+//            }
+//        }
+       
         m_current_wp.GUID = "";
         Recompute();
         m_Timer.Start(1000/prefs.rate);
@@ -680,7 +681,9 @@ void autopilot_route_pi::PositionBearing(double lat0, double lon0, double brg, d
 void autopilot_route_pi::DistanceBearing(double lat0, double lon0, double lat1, double lon1, double *brg, double *dist)
 {
     if(prefs.computation == preferences::MERCATOR)
-        DistanceBearingMercator_Plugin(lat0, lon0, lat1, lon1, brg, dist);
+//        DistanceBearingMercator_Plugin(lat0, lon0, lat1, lon1, brg, dist);
+// to match Sean 098226d
+        APR_DistanceBearingMercator(lat0, lon0, lat1, lon1, brg, dist);
     else
         APR_ll_gc_ll_reverse(lat0, lon0, lat1, lon1, brg, dist);
 }
@@ -800,7 +803,9 @@ double autopilot_route_pi::FindXTE()
     wp b(m_lastfix.Lat, m_lastfix.Lon), w(dlat, dlon);
     wp p = Closest(b, m_current_wp, w);
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, p.lat, p.lon, &brg, &xte);
-    if(wxIsNaN(xte))
+//    if(wxIsNaN(xte))
+//   to match Sean
+    if(isnan(xte))
         xte = 0;
     else if(heading_resolve(brg - m_current_wp.arrival_bearing) < 0)
         xte = -xte;
@@ -963,7 +968,7 @@ void autopilot_route_pi::SendRMC()
     NMEA0183.Rmc.SpeedOverGroundKnots = m_lastfix.Sog;
     NMEA0183.Rmc.TrackMadeGoodDegreesTrue = m_lastfix.Cog;
 
-    if( !wxIsNaN(m_lastfix.Var) ) {
+    if( !isnan(m_lastfix.Var) ) {
         NMEA0183.Rmc.MagneticVariation = fabs(m_lastfix.Var);
         NMEA0183.Rmc.MagneticVariationDirection = m_lastfix.Var < 0. ? West : East;
     } else
@@ -1007,7 +1012,7 @@ void autopilot_route_pi::SendAPB()
     NMEA0183.Apb.BearingPresentPositionToDestination = brg;
             
     NMEA0183.Apb.HeadingToSteer = m_current_bearing;
-    if( prefs.magnetic && !wxIsNaN(m_declination) ) {
+    if( prefs.magnetic && !isnan(m_declination) ) {
         NMEA0183.Apb.BearingOriginToDestinationUnits = _T("M");
         NMEA0183.Apb.BearingPresentPositionToDestinationUnits = _T("M");
         NMEA0183.Apb.HeadingToSteerUnits = _T("M");
