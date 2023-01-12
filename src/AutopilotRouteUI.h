@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version 3.9.0 Sep 12 2020)
+// C++ code generated with wxFormBuilder (version 3.10.1-0-g8feb16b3)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -53,13 +53,13 @@ class PreferencesDialogBase : public wxDialog
 		wxPanel* m_panel9;
 		wxChoicebook* m_cbRoutePositionBearingMode;
 		wxPanel* m_panel91;
-		wxSpinCtrl* m_sRoutePositionBearingDistance;
 		wxStaticText* m_staticText74;
+		wxSpinCtrl* m_sRoutePositionBearingDistance;
 		wxStaticText* m_staticText10;
 		wxSpinCtrl* m_sRoutePositionBearingMaxAngle;
 		wxPanel* m_panel10;
-		wxSpinCtrl* m_sRoutePositionBearingTime;
 		wxStaticText* m_staticText30;
+		wxSpinCtrl* m_sRoutePositionBearingTime;
 		wxChoice* m_cRate;
 		wxStaticText* m_staticText13;
 		wxCheckBox* m_cbMagnetic;
@@ -68,8 +68,8 @@ class PreferencesDialogBase : public wxDialog
 		wxTextCtrl* m_tBoundary;
 		wxButton* m_button22;
 		wxStaticText* m_staticText71;
-		wxSpinCtrl* m_sBoundaryWidth;
 		wxStaticText* m_staticText72;
+		wxSpinCtrl* m_sBoundaryWidth;
 		wxCheckBox* m_cbConfirmBearingChange;
 		wxChoice* m_cComputation;
 		wxCheckListBox* m_cbActiveRouteItems0;
@@ -79,7 +79,7 @@ class PreferencesDialogBase : public wxDialog
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
 
-		// Virtual event handlers, overide them in your derived class
+		// Virtual event handlers, override them in your derived class
 		virtual void OnMode( wxChoicebookEvent& event ) { event.Skip(); }
 		virtual void OnInformation( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnOk( wxCommandEvent& event ) { event.Skip(); }
