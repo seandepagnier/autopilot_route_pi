@@ -441,6 +441,7 @@ bool autopilot_route_pi::GetConsoleInfo(double &sog, double &cog,
 void autopilot_route_pi::DeactivateRoute()
 {
     SendPluginMessage("OCPN_RTE_DEACTIVATED", "");
+    m_current_wp.GUID = "";    
 }
 
 void autopilot_route_pi::Render(piDC &dc, PlugIn_ViewPort &vp)
@@ -512,8 +513,10 @@ void autopilot_route_pi::OnTimer( wxTimerEvent & )
     
     Recompute();
 
-    m_ConsoleCanvas->UpdateRouteData();
-    SendNMEA();
+    if(!m_active_guid.IsEmpty()) {
+        m_ConsoleCanvas->UpdateRouteData();
+        SendNMEA();
+    }
 }
 
 void autopilot_route_pi::Recompute()
@@ -659,7 +662,7 @@ void autopilot_route_pi::SetPluginMessage(wxString &message_id, wxString &messag
 //            }
 //        }
        
-        m_current_wp.GUID = "";
+//        m_current_wp.GUID = "";
         Recompute();
         m_Timer.Start(1000/prefs.rate);
     }
@@ -733,7 +736,7 @@ void autopilot_route_pi::RequestRoute(wxString guid)
     SendPluginMessage("OCPN_ROUTE_REQUEST", w.write(v));
 }
 
-void autopilot_route_pi::AdvanceWaypoint()
+bool autopilot_route_pi::AdvanceWaypoint()
 {
     for(ap_route_iterator it=m_route.begin(); it!=m_route.end(); it++) {
         if(m_current_wp.GUID != it->GUID)
@@ -742,7 +745,7 @@ void autopilot_route_pi::AdvanceWaypoint()
         if(++it == m_route.end()) {
             // reached destination
             SendPluginMessage("OCPN_RTE_ENDED", "");
-            DeactivateRoute();
+            break;
         }
         if(prefs.confirm_bearing_change) {
             wxMessageDialog mdlg(GetOCPNCanvasWindow(), _("Advance Waypoint?"),
@@ -753,10 +756,12 @@ void autopilot_route_pi::AdvanceWaypoint()
 
         m_last_wp_name = m_current_wp.name;
         m_current_wp = *it;
-        return;
+            
+        return false;
     }
     // failed to advance waypoint
     DeactivateRoute();
+    return true;
 }
 
 void autopilot_route_pi::UpdateWaypoint()
@@ -782,7 +787,9 @@ void autopilot_route_pi::UpdateWaypoint()
     m_bArrival = dist < m_current_wp.arrival_radius;
     if(m_bArrival ||
        fabs(heading_resolve(m_current_wp.arrival_bearing - bearing)) > 90) {
-        AdvanceWaypoint();
+        if(AdvanceWaypoint())
+            return;
+
         UpdateWaypoint();
     }
 
@@ -854,6 +861,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
         // reached destination
         SendPluginMessage("OCPN_RTE_ENDED", "");
         DeactivateRoute();
+        return;
     }
 
     wp boat(m_lastfix.Lat, m_lastfix.Lon);
@@ -899,15 +907,17 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
 
     DistanceBearing(m_lastfix.Lat, m_lastfix.Lon, m_current_wp.lat, m_current_wp.lon, &m_current_bearing, 0);
 
-    // clamp to max angle
-    double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
-    double brg = m_current_wp.arrival_bearing;
-    double max_angle = prefs.route_position_bearing_max_angle;
-    if(ang > max_angle)
-        m_current_bearing = brg + max_angle;
-    else
-    if(ang < -max_angle)
-        m_current_bearing = brg - max_angle;
+    if(!havew) {
+        // clamp to max angle only if we are far from route
+        double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
+        double brg = m_current_wp.arrival_bearing;
+        double max_angle = prefs.route_position_bearing_max_angle;
+        if (fabs(ang) < 95)  // do not clamp if we are going to sail past
+        if(ang > max_angle)
+            m_current_bearing = brg + max_angle;
+        else if(ang < -max_angle)
+            m_current_bearing = brg - max_angle;
+    }
         
     m_current_xte = 0;
 }

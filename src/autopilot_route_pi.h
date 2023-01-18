@@ -192,7 +192,7 @@ private:
     bool Intersect(wp &p, double bearing, wp &p0, wp &p1, wp &w);
     
     void RequestRoute(wxString guid);
-    void AdvanceWaypoint();
+    bool AdvanceWaypoint();
     void UpdateWaypoint();
     double FindXTE();
     void ComputeXTE();
