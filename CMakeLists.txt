@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 ## ***
 # ---------------------------------------------------------------------------
-# Testplugin Template: v1.0.223.1 23/01/2022  Author: Jon Gough
+# Testplugin Template: v1.0.226.0 17/02/2022  Author: Jon Gough
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur    ----- ##
 ## ----- Changes should only be made between the section blocks that identify where ----- ##
@@ -54,11 +54,11 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "8")
-set(VERSION_TWEAK "3")
+set(VERSION_PATCH "9")
+set(VERSION_TWEAK "0")
 
-set(VERSION_DATE "23/01/2022") # DD/MM/YYYY format
-set(OCPN_MIN_VERSION "ov50")
+set(VERSION_DATE "03/03/2022") # DD/MM/YYYY format
+set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
 
