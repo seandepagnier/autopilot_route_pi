@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 ## ***
 # ---------------------------------------------------------------------------
-# Testplugin Template: v1.0.230.0 05/03/2022  Author: Jon Gough
+# Testplugin Template: v1.0.237.0 30/04/2023 DD/MM/YYYY format  Author: Jon Gough
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur    ----- ##
 ## ----- Changes should only be made between the section blocks that identify where ----- ##
@@ -54,10 +54,10 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "11")
-set(VERSION_TWEAK "1")
+set(VERSION_PATCH "12")
+set(VERSION_TWEAK "0")
 
-set(VERSION_DATE "31/03/2022") # DD/MM/YYYY format
+set(VERSION_DATE "03/05/2023") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -185,6 +185,7 @@ set(OCPNHDRS
 #set(EXTSRC)
 #set(EXTINCLUDE extinclude/nlohmann/json.hpp extinclude/ODAPI.h)
 #set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 #added for android  from pypilot
 set(LIBHDRS
@@ -192,12 +193,11 @@ set(LIBHDRS
     libs/GL/gl_private.h
     libs/GL/glext.h
     libs/GL/glu.h
-#    libs/wx/include/wx/json_defs.h
-#    libs/wx/include/wx/jsonreader.h
-#    libs/wx/include/wx/jsonval.h
-#    libs/wx/include/wx/jsonwriter.h
-	)
-	
+    libs/wxJSON/include/json_defs.h
+    libs/wxJSON/include/jsonreader.h
+    libs/wxJSON/include/jsonval.h
+    libs/wxJSON/include/jsonwriter.h)
+
 add_definitions(-DPLUGIN_USE_SVG)
 
 set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
@@ -231,9 +231,11 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183) 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183) 
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 
 
@@ -249,6 +251,7 @@ endif(QT_ANDROID)
 ##
 ## ----- Change above to match project requirements for android build ----- ##
 ##
+
 
 
 ## These are NOT used in Testplugin, used for other plugins
@@ -322,9 +325,6 @@ INCLUDE("PluginLocalization")
 INCLUDE("PluginPackage")
 ##=======================================
 
-#from wxroute
-#get_target_property(OUT ${PACKAGE_NAME} LINK_LIBRARIES)
-#message(STATUS "${CMLOC}Libraries: ${OUT}")
 
 ##
 ## ----- do not change section above - needed to configure build process ----- ##
