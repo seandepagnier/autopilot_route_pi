@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 ## ***
 # ---------------------------------------------------------------------------
-# Testplugin Template: v1.0.237.0 30/04/2023 DD/MM/YYYY format  Author: Jon Gough
+# Testplugin Template: v1.0.238.0 09/06/2023 DD/MM/YYYY format  Author: Jon Gough
 # ---------------------------------------------------------------------------
 ## ----- When changing this file do NOT change the order in which sections occur    ----- ##
 ## ----- Changes should only be made between the section blocks that identify where ----- ##
@@ -54,10 +54,10 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "12")
+set(VERSION_PATCH "13")
 set(VERSION_TWEAK "0")
+set(VERSION_DATE "12/06/2023") # DD/MM/YYYY format
 
-set(VERSION_DATE "03/05/2023") # DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "16")
@@ -94,9 +94,11 @@ option(PLUGIN_USE_SVG "Use SVG graphics" OFF)
 set(CMAKE_CXX_STANDARD 11)
 
 # Use local version of GLU library
+# requires libs/glu directory
 # set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
+
 # Don't use local version of GLU library
 set(USE_LOCAL_GLU FALSE)
 
@@ -182,9 +184,13 @@ set(OCPNHDRS
     libs/ocpn-api/ocpn_plugin.h
 )
 
-#set(EXTSRC)
-#set(EXTINCLUDE extinclude/nlohmann/json.hpp extinclude/ODAPI.h)
-#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+#set(EXTSRC
+#)
+#set(EXTINCLUDE
+#    extinclude/ODAPI.h
+#    extinclude/ODJSONSchemas.h
+#)
+
 set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
 #added for android  from pypilot
@@ -212,37 +218,22 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 # ----- If using JSON validation in plugin section above is needed ----- ##
 #
 
-
-##
-# Modify/configure 'Include' Directories below for the Plugin
-##
-
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/extinclude)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)  
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
-
-
-# All from tesplugin v1.0.180
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183) 
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/plugingl)
 
 #
 # ----- Change below to match project requirements for android build ----- ##
 #
-
 
 if(QT_ANDROID)
     include_directories( ${PROJECT_SOURCE_DIR}/extinclude/GLES2)
@@ -288,12 +279,7 @@ if(NOT OCPN_FLATPAK_CONFIG)
 
 endif(NOT OCPN_FLATPAK_CONFIG)
 
-
 add_definitions(-DTIXML_USE_STL)
-
-
-# add_definitions(-DPLUGIN_USE_SVG)
-
 
 #
 # ----- If using JSON validation in plugin section below is needed ----- ##
