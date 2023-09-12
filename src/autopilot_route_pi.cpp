@@ -28,7 +28,7 @@
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
 
-#include "plugingl/pidc.h"
+#include "pidc.h"
 
 #include "json/json.h"
 
