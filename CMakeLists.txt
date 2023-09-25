@@ -207,8 +207,8 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
 
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)

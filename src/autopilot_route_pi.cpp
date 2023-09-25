@@ -912,7 +912,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
         double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
         double brg = m_current_wp.arrival_bearing;
         double max_angle = prefs.route_position_bearing_max_angle;
-        if (fabs(ang) < 95)  // do not clamp if we are going to sail past
+        if(fabs(ang) < 95)  // do not clamp if we are going to sail past
         if(ang > max_angle)
             m_current_bearing = brg + max_angle;
         else if(ang < -max_angle)
