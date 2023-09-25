@@ -190,21 +190,21 @@ SET(SRC ${SRCS} ${HDRS} )
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
 ## Change target_sources to match your project needs.
 ##==============================================================
@@ -242,8 +242,8 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/jsoncpp)
     target_link_libraries(${PACKAGE_NAME} ocpn::jsoncpp)
 
-#    add_subdirectory(opencpn-libs/wxJSON)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::wxjson)
+    add_subdirectory(opencpn-libs/wxJSON)
+    target_link_libraries(${PACKAGE_NAME} ocpn::wxjson)
 
     add_subdirectory(opencpn-libs/plugingl)
     target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
