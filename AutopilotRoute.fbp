@@ -2112,7 +2112,7 @@
                                                 <property name="caption"></property>
                                                 <property name="caption_visible">1</property>
                                                 <property name="center_pane">0</property>
-                                                <property name="choices">&quot;XTE&quot; &quot;BRG&quot; &quot;VMG&quot; &quot;RNG&quot; &quot;TTG&quot; &quot;Route ETA&quot; &quot;Route RNG&quot; &quot;Route TTG&quot; &quot;Highway&quot; &quot;Deactivate&quot;</property>
+                                                <property name="choices">&quot;XTE&quot; &quot;BRG&quot; &quot;VMG&quot; &quot;RNG&quot; &quot;TTG&quot;</property>
                                                 <property name="close_button">1</property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
@@ -2175,7 +2175,7 @@
                                                 <property name="caption"></property>
                                                 <property name="caption_visible">1</property>
                                                 <property name="center_pane">0</property>
-                                                <property name="choices">&quot;XTE&quot; &quot;BRG&quot; &quot;VMG&quot; &quot;RNG&quot; &quot;TTG&quot; &quot;Route ETA&quot; &quot;Route RNG&quot; &quot;Route TTG&quot; &quot;Highway&quot; &quot;Deactivate&quot;</property>
+                                                <property name="choices">&quot;Route ETA&quot; &quot;Route RNG&quot; &quot;Route TTG&quot; &quot;Highway&quot; &quot;Deactivate&quot;</property>
                                                 <property name="close_button">1</property>
                                                 <property name="context_help"></property>
                                                 <property name="context_menu">1</property>
