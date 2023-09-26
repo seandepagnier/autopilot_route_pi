@@ -55,9 +55,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "17")
+set(VERSION_PATCH "18")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "25/09/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "26/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
@@ -190,21 +190,14 @@ SET(SRC ${SRCS} ${HDRS} )
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ODAPI)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/opencpn-libs/glu/include)
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC)
 
 ## Change target_sources to match your project needs.
 ##==============================================================
@@ -218,14 +211,6 @@ if(NOT OCPN_FLATPAK_CONFIG)
 	# so following statements will not work
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
 
-#    add_subdirectory(libs/jsoncpp)
-#    add_subdirectory(libs/nmea0183)
-#    add_subdirectory(libs/tinyxml)
-#    add_subdirectory(libs/pluginDC)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::jsoncpp)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::nmea0183)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)
 
     add_subdirectory(opencpn-libs/WindowsHeaders)
     target_link_libraries(${PACKAGE_NAME} windows::headers)
