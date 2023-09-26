@@ -55,7 +55,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "18")
+set(VERSION_PATCH "19")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE  "26/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
@@ -210,7 +210,6 @@ if(NOT OCPN_FLATPAK_CONFIG)
     # Build environment not available when flatpak is being configured 
 	# so following statements will not work
     message(STATUS "${CMLOC}Adding target link libraries to ${PACKAGE_NAME}")
-
 
     add_subdirectory(opencpn-libs/WindowsHeaders)
     target_link_libraries(${PACKAGE_NAME} windows::headers)
