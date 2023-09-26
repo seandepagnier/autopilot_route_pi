@@ -115,6 +115,7 @@ message(STATUS "${CMLOC}Build type: ${CMAKE_BUILD_TYPE}")
 project(${PACKAGE})
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 ##========================================================
 
@@ -188,16 +189,8 @@ SET(SRC ${SRCS} ${HDRS} )
 ## Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/opencpn-libs/glu/include)
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/json)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/pluginDC/include)
-
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/nmea0183)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/nmea0183)
 
 ## Change target_sources to match your project needs.
 ##==============================================================
