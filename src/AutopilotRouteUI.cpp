@@ -177,7 +177,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	wxString m_cbNMEASentencesChoices[] = { _("RMB"), _("RMC"), _("APB"), _("XTE") };
 	int m_cbNMEASentencesNChoices = sizeof( m_cbNMEASentencesChoices ) / sizeof( wxString );
-	m_cbNMEASentences = new wxCheckListBox( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,90 ), m_cbNMEASentencesNChoices, m_cbNMEASentencesChoices, 0 );
+	m_cbNMEASentences = new wxCheckListBox( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,180 ), m_cbNMEASentencesNChoices, m_cbNMEASentencesChoices, 0 );
 	fgSizer161->Add( m_cbNMEASentences, 0, wxALL|wxEXPAND, 5 );
 
 
@@ -272,12 +272,12 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	wxString m_cbActiveRouteItems0Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG") };
 	int m_cbActiveRouteItems0NChoices = sizeof( m_cbActiveRouteItems0Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,180 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
+	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,240 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
 	fgSizer16->Add( m_cbActiveRouteItems0, 0, wxALL|wxEXPAND, 5 );
 
 	wxString m_cbActiveRouteItems1Choices[] = { _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway"), _("Deactivate") };
 	int m_cbActiveRouteItems1NChoices = sizeof( m_cbActiveRouteItems1Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,180 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
+	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,240 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
 	fgSizer16->Add( m_cbActiveRouteItems1, 0, wxALL, 5 );
 
 
