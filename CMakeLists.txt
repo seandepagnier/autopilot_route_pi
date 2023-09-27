@@ -189,8 +189,6 @@ SET(SRC ${SRCS} ${HDRS} )
 ## Modify/configure 'Include' Directories below for the Plugin
 ##=============================================================
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/opencpn-libs/glu/include)
-
 
 ## Change target_sources to match your project needs.
 ##==============================================================
