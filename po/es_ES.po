@@ -1,0 +1,225 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: opencpn\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-19 20:53+0200\n"
+"PO-Revision-Date: 2023-11-09 21:22\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Project-ID: 49843\n"
+"X-Crowdin-Language: es-ES\n"
+"X-Crowdin-File: /plugins/autopilot_route_pi/po/autopilot_route_pi.pot\n"
+"X-Crowdin-File-ID: 440\n"
+
+#: src/AutopilotRouteUI.cpp:31
+msgid "Mode"
+msgstr "Modo"
+
+#: src/AutopilotRouteUI.cpp:47
+msgid "XTE Multiplier"
+msgstr "Multiplicador XTE"
+
+#: src/AutopilotRouteUI.cpp:55
+msgid "%"
+msgstr "%"
+
+#: src/AutopilotRouteUI.cpp:63
+msgid "Standard XTE"
+msgstr "XTE Estándar"
+
+#: src/AutopilotRouteUI.cpp:74
+msgid "Waypoint Bearing"
+msgstr "Demora a Punto de Ruta"
+
+#: src/AutopilotRouteUI.cpp:88
+msgid "Meters"
+msgstr "Metros"
+
+#: src/AutopilotRouteUI.cpp:95
+msgid "MaxErrorAngle"
+msgstr "AngErrorMax"
+
+#: src/AutopilotRouteUI.cpp:106
+msgid "By Distance"
+msgstr "Por Distancia"
+
+#: src/AutopilotRouteUI.cpp:113
+msgid "Seconds"
+msgstr "Segundos"
+
+#: src/AutopilotRouteUI.cpp:124
+msgid "By Time"
+msgstr "Por Tiempo"
+
+#: src/AutopilotRouteUI.cpp:131
+msgid "Route Position Bearing"
+msgstr "Demora por posición de Ruta"
+
+#: src/AutopilotRouteUI.cpp:141
+msgid "NMEA Sentences"
+msgstr "Sentencias NMEA"
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "1"
+msgstr "1"
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "10"
+msgstr "10"
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "2"
+msgstr "2"
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "5"
+msgstr "5"
+
+#: src/AutopilotRouteUI.cpp:165
+msgid "hz"
+msgstr "hz"
+
+#: src/AutopilotRouteUI.cpp:172
+msgid "Magnetic"
+msgstr "Magnética"
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "APB"
+msgstr "APB"
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "RMB"
+msgstr "RMB"
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "RMC"
+msgstr "RMC"
+
+#: src/AutopilotRouteUI.cpp:178 src/AutopilotRouteUI.cpp:273
+msgid "XTE"
+msgstr "XTE"
+
+#: src/AutopilotRouteUI.cpp:190
+msgid "Boundary"
+msgstr "Límite"
+
+#: src/AutopilotRouteUI.cpp:198
+msgid "GUID"
+msgstr "GUID"
+
+#: src/AutopilotRouteUI.cpp:212
+msgid "Generate"
+msgstr "Generar"
+
+#: src/AutopilotRouteUI.cpp:215
+msgid "Width"
+msgstr "Anchura"
+
+#: src/AutopilotRouteUI.cpp:219
+msgid "M"
+msgstr "M"
+
+#: src/AutopilotRouteUI.cpp:242
+msgid "Options"
+msgstr "Opciones"
+
+#: src/AutopilotRouteUI.cpp:249
+msgid "Confirm Bearing Change\n"
+"On Waypoint Arrival"
+msgstr "Confirmar cambio Demora\n"
+"al llegar al punto de ruta"
+
+#: src/AutopilotRouteUI.cpp:252
+msgid "Great Circle (Shortest Distance)"
+msgstr "Círculo Máximo (Distancia mas corta)"
+
+#: src/AutopilotRouteUI.cpp:252
+msgid "Mercator (Constant Bearings)"
+msgstr "Loxodrómica (Rumbo constante)"
+
+#: src/AutopilotRouteUI.cpp:265
+msgid "Active Route Windows"
+msgstr "Activar Ventana de Ruta"
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "BRG"
+msgstr "BRG"
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "RNG"
+msgstr "RNG"
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "TTG"
+msgstr "TTG"
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "VMG"
+msgstr "VMG"
+
+#: src/AutopilotRouteUI.cpp:278 src/concanv.cpp:126 src/concanv.cpp:207
+msgid "Deactivate"
+msgstr "Desactivar"
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Highway"
+msgstr "Carretera"
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route ETA"
+msgstr "ETA de Ruta"
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route RNG"
+msgstr "Ruta RNG"
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route TTG"
+msgstr "TTG Ruta"
+
+#: src/AutopilotRouteUI.cpp:295
+msgid "Information"
+msgstr "Información"
+
+#: src/AutopilotRouteUI.h:90
+msgid "Autopilot Route Preferences"
+msgstr "Preferencias Autopilot Route"
+
+#: src/autopilot_route_pi.cpp:762
+msgid "Advance Waypoint?"
+msgstr "¿Saltar punto ruta?"
+
+#: src/autopilot_route_pi.cpp:763
+msgid "Autopilot Route"
+msgstr "Ruta Piloto automático "
+
+#: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
+#: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
+#: src/concanv.cpp:116
+msgid "Console Legend"
+msgstr "Leyenda de la consola"
+
+#: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
+#: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
+#: src/concanv.cpp:116
+msgid "Console Value"
+msgstr "Valor de la consola"
+
+#: src/concanv.cpp:208
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: src/concanv.cpp:209
+msgid "Undock"
+msgstr "Desanclar"
+
+#: src/concanv.cpp:339
+msgid "%Dd %H:%M"
+msgstr "%Dd %H:%M"
+
