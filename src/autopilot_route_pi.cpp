@@ -196,6 +196,8 @@ bool autopilot_route_pi::DeInit(void)
         wxPoint p = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_pos;
         pConf->Write("PosX", p.x);
         pConf->Write("PosY", p.y);
+
+        GetFrameAuiManager()->DetachPane(m_ConsoleCanvas);
     }
     delete m_ConsoleCanvas;
    
