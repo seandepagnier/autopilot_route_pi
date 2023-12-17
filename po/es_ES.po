@@ -1,224 +1,225 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the autopilot_route_pi package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: autopilot_route_pi 0.4.30.0\n"
+"Project-Id-Version: opencpn\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 20:53+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2023-11-09 21:22\n"
+"Last-Translator: \n"
+"Language-Team: Spanish\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Project-ID: 49843\n"
+"X-Crowdin-Language: es-ES\n"
+"X-Crowdin-File: /plugins/autopilot_route_pi/po/autopilot_route_pi.pot\n"
+"X-Crowdin-File-ID: 440\n"
 
 #: src/AutopilotRouteUI.cpp:31
 msgid "Mode"
-msgstr ""
+msgstr "Modo"
 
 #: src/AutopilotRouteUI.cpp:47
 msgid "XTE Multiplier"
-msgstr ""
+msgstr "Multiplicador XTE"
 
 #: src/AutopilotRouteUI.cpp:55
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: src/AutopilotRouteUI.cpp:63
 msgid "Standard XTE"
-msgstr ""
+msgstr "XTE Estándar"
 
 #: src/AutopilotRouteUI.cpp:74
 msgid "Waypoint Bearing"
-msgstr ""
+msgstr "Demora a Punto de Ruta"
 
 #: src/AutopilotRouteUI.cpp:88
 msgid "Meters"
-msgstr ""
+msgstr "Metros"
 
 #: src/AutopilotRouteUI.cpp:95
 msgid "MaxErrorAngle"
-msgstr ""
+msgstr "AngErrorMax"
 
 #: src/AutopilotRouteUI.cpp:106
 msgid "By Distance"
-msgstr ""
+msgstr "Por Distancia"
 
 #: src/AutopilotRouteUI.cpp:113
 msgid "Seconds"
-msgstr ""
+msgstr "Segundos"
 
 #: src/AutopilotRouteUI.cpp:124
 msgid "By Time"
-msgstr ""
+msgstr "Por Tiempo"
 
 #: src/AutopilotRouteUI.cpp:131
 msgid "Route Position Bearing"
-msgstr ""
+msgstr "Demora por posición de Ruta"
 
 #: src/AutopilotRouteUI.cpp:141
 msgid "NMEA Sentences"
-msgstr ""
+msgstr "Sentencias NMEA"
 
 #: src/AutopilotRouteUI.cpp:159
 msgid "1"
-msgstr ""
+msgstr "1"
 
 #: src/AutopilotRouteUI.cpp:159
 msgid "10"
-msgstr ""
+msgstr "10"
 
 #: src/AutopilotRouteUI.cpp:159
 msgid "2"
-msgstr ""
+msgstr "2"
 
 #: src/AutopilotRouteUI.cpp:159
 msgid "5"
-msgstr ""
+msgstr "5"
 
 #: src/AutopilotRouteUI.cpp:165
 msgid "hz"
-msgstr ""
+msgstr "hz"
 
 #: src/AutopilotRouteUI.cpp:172
 msgid "Magnetic"
-msgstr ""
+msgstr "Magnética"
 
 #: src/AutopilotRouteUI.cpp:178
 msgid "APB"
-msgstr ""
+msgstr "APB"
 
 #: src/AutopilotRouteUI.cpp:178
 msgid "RMB"
-msgstr ""
+msgstr "RMB"
 
 #: src/AutopilotRouteUI.cpp:178
 msgid "RMC"
-msgstr ""
+msgstr "RMC"
 
 #: src/AutopilotRouteUI.cpp:178 src/AutopilotRouteUI.cpp:273
 msgid "XTE"
-msgstr ""
+msgstr "XTE"
 
 #: src/AutopilotRouteUI.cpp:190
 msgid "Boundary"
-msgstr ""
+msgstr "Límite"
 
 #: src/AutopilotRouteUI.cpp:198
 msgid "GUID"
-msgstr ""
+msgstr "GUID"
 
 #: src/AutopilotRouteUI.cpp:212
 msgid "Generate"
-msgstr ""
+msgstr "Generar"
 
 #: src/AutopilotRouteUI.cpp:215
 msgid "Width"
-msgstr ""
+msgstr "Anchura"
 
 #: src/AutopilotRouteUI.cpp:219
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: src/AutopilotRouteUI.cpp:242
 msgid "Options"
-msgstr ""
+msgstr "Opciones"
 
 #: src/AutopilotRouteUI.cpp:249
-msgid ""
-"Confirm Bearing Change\n"
+msgid "Confirm Bearing Change\n"
 "On Waypoint Arrival"
-msgstr ""
+msgstr "Confirmar cambio Demora\n"
+"al llegar al punto de ruta"
 
 #: src/AutopilotRouteUI.cpp:252
 msgid "Great Circle (Shortest Distance)"
-msgstr ""
+msgstr "Círculo Máximo (Distancia mas corta)"
 
 #: src/AutopilotRouteUI.cpp:252
 msgid "Mercator (Constant Bearings)"
-msgstr ""
+msgstr "Loxodrómica (Rumbo constante)"
 
 #: src/AutopilotRouteUI.cpp:265
 msgid "Active Route Windows"
-msgstr ""
+msgstr "Activar Ventana de Ruta"
 
 #: src/AutopilotRouteUI.cpp:273
 msgid "BRG"
-msgstr ""
+msgstr "BRG"
 
 #: src/AutopilotRouteUI.cpp:273
 msgid "RNG"
-msgstr ""
+msgstr "RNG"
 
 #: src/AutopilotRouteUI.cpp:273
 msgid "TTG"
-msgstr ""
+msgstr "TTG"
 
 #: src/AutopilotRouteUI.cpp:273
 msgid "VMG"
-msgstr ""
+msgstr "VMG"
 
 #: src/AutopilotRouteUI.cpp:278 src/concanv.cpp:126 src/concanv.cpp:207
 msgid "Deactivate"
-msgstr ""
+msgstr "Desactivar"
 
 #: src/AutopilotRouteUI.cpp:278
 msgid "Highway"
-msgstr ""
+msgstr "Carretera"
 
 #: src/AutopilotRouteUI.cpp:278
 msgid "Route ETA"
-msgstr ""
+msgstr "ETA de Ruta"
 
 #: src/AutopilotRouteUI.cpp:278
 msgid "Route RNG"
-msgstr ""
+msgstr "Ruta RNG"
 
 #: src/AutopilotRouteUI.cpp:278
 msgid "Route TTG"
-msgstr ""
+msgstr "TTG Ruta"
 
 #: src/AutopilotRouteUI.cpp:295
 msgid "Information"
-msgstr ""
+msgstr "Información"
 
 #: src/AutopilotRouteUI.h:90
 msgid "Autopilot Route Preferences"
-msgstr ""
+msgstr "Preferencias Autopilot Route"
 
 #: src/autopilot_route_pi.cpp:762
 msgid "Advance Waypoint?"
-msgstr ""
+msgstr "¿Saltar punto ruta?"
 
 #: src/autopilot_route_pi.cpp:763
 msgid "Autopilot Route"
-msgstr ""
+msgstr "Ruta Piloto automático "
 
 #: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
 #: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
 #: src/concanv.cpp:116
 msgid "Console Legend"
-msgstr ""
+msgstr "Leyenda de la consola"
 
 #: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
 #: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
 #: src/concanv.cpp:116
 msgid "Console Value"
-msgstr ""
+msgstr "Valor de la consola"
 
 #: src/concanv.cpp:208
 msgid "Preferences"
-msgstr ""
+msgstr "Preferencias"
 
 #: src/concanv.cpp:209
 msgid "Undock"
-msgstr ""
+msgstr "Desanclar"
 
 #: src/concanv.cpp:339
 msgid "%Dd %H:%M"
-msgstr ""
+msgstr "%Dd %H:%M"
+
