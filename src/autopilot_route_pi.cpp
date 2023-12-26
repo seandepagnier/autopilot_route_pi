@@ -28,7 +28,7 @@
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
 
-#include "plugingl/pidc.h"
+#include "pidc.h"
 
 #include "json/json.h"
 
@@ -77,7 +77,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_116(ppimgr)
+    : opencpn_plugin_117(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -196,6 +196,8 @@ bool autopilot_route_pi::DeInit(void)
         wxPoint p = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_pos;
         pConf->Write("PosX", p.x);
         pConf->Write("PosY", p.y);
+
+        GetFrameAuiManager()->DetachPane(m_ConsoleCanvas);
     }
     delete m_ConsoleCanvas;
    
@@ -257,6 +259,17 @@ int autopilot_route_pi::GetPlugInVersionMinor()
 {
     return PLUGIN_VERSION_MINOR;
 }
+
+int autopilot_route_pi::GetPlugInVersionPatch()
+{
+    return PLUGIN_VERSION_PATCH;
+}
+
+int autopilot_route_pi::GetPlugInVersionPost()
+{
+    return PLUGIN_VERSION_TWEAK;
+}
+
 
 //  Converts  icon.cpp file to an image. Original process
 //wxBitmap *autopilot_route_pi::GetPlugInBitmap()
@@ -912,7 +925,7 @@ void autopilot_route_pi::ComputeRoutePositionBearing()
         double ang = heading_resolve(m_current_bearing - m_current_wp.arrival_bearing);
         double brg = m_current_wp.arrival_bearing;
         double max_angle = prefs.route_position_bearing_max_angle;
-        if (fabs(ang) < 95)  // do not clamp if we are going to sail past
+        if(fabs(ang) < 95)  // do not clamp if we are going to sail past
         if(ang > max_angle)
             m_current_bearing = brg + max_angle;
         else if(ang < -max_angle)

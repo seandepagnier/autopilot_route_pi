@@ -5,7 +5,6 @@ src/concanv.cpp
 src/computation.cpp
 src/georef.c
 src/icons.cpp
-src/ODAPI.h
 src/PreferencesDialog.h
 src/msvcdefs.h
 src/icons.h
