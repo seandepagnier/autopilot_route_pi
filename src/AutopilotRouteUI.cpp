@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version 3.10.1-0-g8feb16b3)
+// C++ code generated with wxFormBuilder (version 3.9.0 Sep 12 2020)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -37,7 +37,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer37->SetFlexibleDirection( wxBOTH );
 	fgSizer37->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_cbMode = new wxChoicebook( sbSizer7->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxCHB_DEFAULT );
+	m_cbMode = new wxChoicebook( sbSizer7->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( 200,-1 ), wxCHB_DEFAULT );
 	m_panel5 = new wxPanel( m_cbMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer44;
 	fgSizer44 = new wxFlexGridSizer( 0, 3, 0, 0 );
@@ -46,10 +46,12 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	m_staticText57 = new wxStaticText( m_panel5, wxID_ANY, _("XTE Multiplier"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText57->Wrap( -1 );
-	fgSizer44->Add( m_staticText57, 1, wxALL, 5 );
+	fgSizer44->Add( m_staticText57, 0, wxALL, 5 );
 
 	m_sXTEP = new wxSpinCtrlDouble( m_panel5, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 10000, 0, 1 );
 	m_sXTEP->SetDigits( 0 );
+	m_sXTEP->SetMaxSize( wxSize( 100,-1 ) );
+
 	fgSizer44->Add( m_sXTEP, 0, wxALL, 5 );
 
 	m_staticText561 = new wxStaticText( m_panel5, wxID_ANY, _("%"), wxDefaultPosition, wxDefaultSize, 0 );
@@ -60,7 +62,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_panel5->SetSizer( fgSizer44 );
 	m_panel5->Layout();
 	fgSizer44->Fit( m_panel5 );
-	m_cbMode->AddPage( m_panel5, _("Standard XTE"), true );
+	m_cbMode->AddPage( m_panel5, _("Standard XTE"), false );
 	m_panel8 = new wxPanel( m_cbMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer50;
 	fgSizer50 = new wxFlexGridSizer( 0, 2, 0, 0 );
@@ -78,57 +80,57 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer51->SetFlexibleDirection( wxBOTH );
 	fgSizer51->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_cbRoutePositionBearingMode = new wxChoicebook( m_panel9, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxCHB_DEFAULT );
-	m_panel91 = new wxPanel( m_cbRoutePositionBearingMode, wxID_ANY, wxDefaultPosition, wxSize( -1,-1 ), wxTAB_TRAVERSAL );
+	m_cbRoutePositionBearingMode = new wxChoicebook( m_panel9, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxCHB_DEFAULT );
+	m_panel91 = new wxPanel( m_cbRoutePositionBearingMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer19;
 	fgSizer19 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer19->SetFlexibleDirection( wxVERTICAL );
-	fgSizer19->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
+	fgSizer19->SetFlexibleDirection( wxBOTH );
+	fgSizer19->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText74 = new wxStaticText( m_panel91, wxID_ANY, _("Meters"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
-	m_staticText74->Wrap( -1 );
-	fgSizer19->Add( m_staticText74, 1, wxALL, 5 );
-
-	m_sRoutePositionBearingDistance = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 1000, 99 );
+	m_sRoutePositionBearingDistance = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 100,-1 ), wxSP_ARROW_KEYS, 1, 1000, 100 );
 	fgSizer19->Add( m_sRoutePositionBearingDistance, 0, wxALL, 5 );
 
-	m_staticText10 = new wxStaticText( m_panel91, wxID_ANY, _("MaxErrorAngle"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
+	m_staticText74 = new wxStaticText( m_panel91, wxID_ANY, _("Meters"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText74->Wrap( -1 );
+	fgSizer19->Add( m_staticText74, 0, wxALL, 5 );
+
+	m_staticText10 = new wxStaticText( m_panel91, wxID_ANY, _("Max Error Angle"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText10->Wrap( -1 );
 	fgSizer19->Add( m_staticText10, 0, wxALL, 5 );
 
-	m_sRoutePositionBearingMaxAngle = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
+	m_sRoutePositionBearingMaxAngle = new wxSpinCtrl( m_panel91, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
 	fgSizer19->Add( m_sRoutePositionBearingMaxAngle, 0, wxALL, 5 );
 
 
 	m_panel91->SetSizer( fgSizer19 );
 	m_panel91->Layout();
 	fgSizer19->Fit( m_panel91 );
-	m_cbRoutePositionBearingMode->AddPage( m_panel91, _("By Distance"), false );
+	m_cbRoutePositionBearingMode->AddPage( m_panel91, _("By Distance"), true );
 	m_panel10 = new wxPanel( m_cbRoutePositionBearingMode, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxFlexGridSizer* fgSizer20;
 	fgSizer20 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer20->SetFlexibleDirection( wxVERTICAL );
-	fgSizer20->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_NONE );
+	fgSizer20->SetFlexibleDirection( wxBOTH );
+	fgSizer20->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_sRoutePositionBearingTime = new wxSpinCtrl( m_panel10, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 10, 2000, 0 );
+	fgSizer20->Add( m_sRoutePositionBearingTime, 0, wxALL, 5 );
 
 	m_staticText30 = new wxStaticText( m_panel10, wxID_ANY, _("Seconds"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText30->Wrap( -1 );
 	fgSizer20->Add( m_staticText30, 0, wxALL, 5 );
 
-	m_sRoutePositionBearingTime = new wxSpinCtrl( m_panel10, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 10, 2000, 0 );
-	fgSizer20->Add( m_sRoutePositionBearingTime, 0, wxALL, 5 );
-
 
 	m_panel10->SetSizer( fgSizer20 );
 	m_panel10->Layout();
 	fgSizer20->Fit( m_panel10 );
-	m_cbRoutePositionBearingMode->AddPage( m_panel10, _("By Time"), true );
+	m_cbRoutePositionBearingMode->AddPage( m_panel10, _("By Time"), false );
 	fgSizer51->Add( m_cbRoutePositionBearingMode, 1, wxEXPAND | wxALL, 5 );
 
 
 	m_panel9->SetSizer( fgSizer51 );
 	m_panel9->Layout();
 	fgSizer51->Fit( m_panel9 );
-	m_cbMode->AddPage( m_panel9, _("Route Position Bearing"), false );
+	m_cbMode->AddPage( m_panel9, _("Route Position Bearing"), true );
 	fgSizer37->Add( m_cbMode, 1, wxEXPAND | wxALL, 5 );
 
 
@@ -177,7 +179,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	wxString m_cbNMEASentencesChoices[] = { _("RMB"), _("RMC"), _("APB"), _("XTE") };
 	int m_cbNMEASentencesNChoices = sizeof( m_cbNMEASentencesChoices ) / sizeof( wxString );
-	m_cbNMEASentences = new wxCheckListBox( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,90 ), m_cbNMEASentencesNChoices, m_cbNMEASentencesChoices, 0 );
+	m_cbNMEASentences = new wxCheckListBox( sbSizer6->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,80 ), m_cbNMEASentencesNChoices, m_cbNMEASentencesChoices, 0 );
 	fgSizer161->Add( m_cbNMEASentences, 0, wxALL|wxEXPAND, 5 );
 
 
@@ -216,12 +218,12 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText71->Wrap( -1 );
 	fgSizer56->Add( m_staticText71, 0, wxALL, 5 );
 
+	m_sBoundaryWidth = new wxSpinCtrl( sbSizer9->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 80,-1 ), wxSP_ARROW_KEYS, 1, 1000, 30 );
+	fgSizer56->Add( m_sBoundaryWidth, 0, wxALL, 5 );
+
 	m_staticText72 = new wxStaticText( sbSizer9->GetStaticBox(), wxID_ANY, _("M"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText72->Wrap( -1 );
 	fgSizer56->Add( m_staticText72, 0, wxALL, 5 );
-
-	m_sBoundaryWidth = new wxSpinCtrl( sbSizer9->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 1000, 30 );
-	fgSizer56->Add( m_sBoundaryWidth, 0, wxALL, 5 );
 
 
 	sbSizer9->Add( fgSizer56, 1, wxEXPAND, 5 );
@@ -249,6 +251,9 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_cbConfirmBearingChange = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Confirm Bearing Change\nOn Waypoint Arrival"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer45->Add( m_cbConfirmBearingChange, 0, wxALL, 5 );
 
+	m_cbInterceptRoute = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Intercept Route"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer45->Add( m_cbInterceptRoute, 0, wxALL, 5 );
+
 	wxString m_cComputationChoices[] = { _("Great Circle (Shortest Distance)"), _("Mercator (Constant Bearings)") };
 	int m_cComputationNChoices = sizeof( m_cComputationChoices ) / sizeof( wxString );
 	m_cComputation = new wxChoice( sbSizer10->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, m_cComputationNChoices, m_cComputationChoices, 0 );
@@ -272,12 +277,12 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	wxString m_cbActiveRouteItems0Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway"), _("Deactivate") };
 	int m_cbActiveRouteItems0NChoices = sizeof( m_cbActiveRouteItems0Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,180 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
+	m_cbActiveRouteItems0 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems0NChoices, m_cbActiveRouteItems0Choices, 0 );
 	fgSizer16->Add( m_cbActiveRouteItems0, 0, wxALL|wxEXPAND, 5 );
 
 	wxString m_cbActiveRouteItems1Choices[] = { _("XTE"), _("BRG"), _("VMG"), _("RNG"), _("TTG"), _("Route ETA"), _("Route RNG"), _("Route TTG"), _("Highway"), _("Deactivate") };
 	int m_cbActiveRouteItems1NChoices = sizeof( m_cbActiveRouteItems1Choices ) / sizeof( wxString );
-	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,180 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
+	m_cbActiveRouteItems1 = new wxCheckListBox( sbSizer5->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxSize( -1,120 ), m_cbActiveRouteItems1NChoices, m_cbActiveRouteItems1Choices, 0 );
 	fgSizer16->Add( m_cbActiveRouteItems1, 0, wxALL, 5 );
 
 
