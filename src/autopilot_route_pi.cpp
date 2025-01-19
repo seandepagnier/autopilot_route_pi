@@ -77,7 +77,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_117(ppimgr)
+    : opencpn_plugin_118(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -270,6 +270,7 @@ int autopilot_route_pi::GetPlugInVersionPost()
 {
     return PLUGIN_VERSION_TWEAK;
 }
+
 
 
 //  Converts  icon.cpp file to an image. Original process

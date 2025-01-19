@@ -83,7 +83,7 @@ public:
 typedef std::list<waypoint> ap_route;
 typedef std::list<waypoint>::iterator ap_route_iterator;
 
-class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_117
+class autopilot_route_pi : public wxEvtHandler, public opencpn_plugin_118
 {
     friend ConsoleCanvas;
 public:
