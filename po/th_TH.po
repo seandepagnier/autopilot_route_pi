@@ -1,0 +1,224 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: opencpn\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-10-19 20:53+0200\n"
+"PO-Revision-Date: 2023-11-09 21:22\n"
+"Last-Translator: \n"
+"Language-Team: Thai\n"
+"Language: th_TH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Crowdin-Project: opencpn\n"
+"X-Crowdin-Project-ID: 49843\n"
+"X-Crowdin-Language: th\n"
+"X-Crowdin-File: /plugins/autopilot_route_pi/po/autopilot_route_pi.pot\n"
+"X-Crowdin-File-ID: 440\n"
+
+#: src/AutopilotRouteUI.cpp:31
+msgid "Mode"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:47
+msgid "XTE Multiplier"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:55
+msgid "%"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:63
+msgid "Standard XTE"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:74
+msgid "Waypoint Bearing"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:88
+msgid "Meters"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:95
+msgid "MaxErrorAngle"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:106
+msgid "By Distance"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:113
+msgid "Seconds"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:124
+msgid "By Time"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:131
+msgid "Route Position Bearing"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:141
+msgid "NMEA Sentences"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "1"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "10"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "2"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:159
+msgid "5"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:165
+msgid "hz"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:172
+msgid "Magnetic"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "APB"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "RMB"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:178
+msgid "RMC"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:178 src/AutopilotRouteUI.cpp:273
+msgid "XTE"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:190
+msgid "Boundary"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:198
+msgid "GUID"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:212
+msgid "Generate"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:215
+msgid "Width"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:219
+msgid "M"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:242
+msgid "Options"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:249
+msgid "Confirm Bearing Change\n"
+"On Waypoint Arrival"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:252
+msgid "Great Circle (Shortest Distance)"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:252
+msgid "Mercator (Constant Bearings)"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:265
+msgid "Active Route Windows"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "BRG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "RNG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "TTG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:273
+msgid "VMG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:278 src/concanv.cpp:126 src/concanv.cpp:207
+msgid "Deactivate"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Highway"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route ETA"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route RNG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:278
+msgid "Route TTG"
+msgstr ""
+
+#: src/AutopilotRouteUI.cpp:295
+msgid "Information"
+msgstr ""
+
+#: src/AutopilotRouteUI.h:90
+msgid "Autopilot Route Preferences"
+msgstr ""
+
+#: src/autopilot_route_pi.cpp:762
+msgid "Advance Waypoint?"
+msgstr ""
+
+#: src/autopilot_route_pi.cpp:763
+msgid "Autopilot Route"
+msgstr ""
+
+#: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
+#: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
+#: src/concanv.cpp:116
+msgid "Console Legend"
+msgstr ""
+
+#: src/concanv.cpp:88 src/concanv.cpp:92 src/concanv.cpp:96 src/concanv.cpp:100
+#: src/concanv.cpp:104 src/concanv.cpp:108 src/concanv.cpp:112
+#: src/concanv.cpp:116
+msgid "Console Value"
+msgstr ""
+
+#: src/concanv.cpp:208
+msgid "Preferences"
+msgstr ""
+
+#: src/concanv.cpp:209
+msgid "Undock"
+msgstr ""
+
+#: src/concanv.cpp:339
+msgid "%Dd %H:%M"
+msgstr ""
+

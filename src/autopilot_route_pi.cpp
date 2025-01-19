@@ -28,7 +28,7 @@
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
 
-#include "plugingl/pidc.h"
+#include "pidc.h"
 
 #include "json/json.h"
 
@@ -77,7 +77,7 @@ waypoint::waypoint(double lat, double lon, wxString n, wxString guid,
 //-----------------------------------------------------------------------------
 
 autopilot_route_pi::autopilot_route_pi(void *ppimgr)
-    : opencpn_plugin_116(ppimgr)
+    : opencpn_plugin_118(ppimgr)
 {
     // Create the PlugIn icons
     initialize_images();
@@ -196,6 +196,8 @@ bool autopilot_route_pi::DeInit(void)
         wxPoint p = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_pos;
         pConf->Write("PosX", p.x);
         pConf->Write("PosY", p.y);
+
+        GetFrameAuiManager()->DetachPane(m_ConsoleCanvas);
     }
     delete m_ConsoleCanvas;
    
@@ -258,6 +260,18 @@ int autopilot_route_pi::GetPlugInVersionMinor()
 {
     return PLUGIN_VERSION_MINOR;
 }
+
+int autopilot_route_pi::GetPlugInVersionPatch()
+{
+    return PLUGIN_VERSION_PATCH;
+}
+
+int autopilot_route_pi::GetPlugInVersionPost()
+{
+    return PLUGIN_VERSION_TWEAK;
+}
+
+
 
 //  Converts  icon.cpp file to an image. Original process
 //wxBitmap *autopilot_route_pi::GetPlugInBitmap()
