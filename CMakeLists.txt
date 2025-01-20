@@ -45,7 +45,9 @@ if(COMMAND cmake_policy)
 endif (COMMAND cmake_policy)
 
 # set for vscode/vscodium
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # define plugin name, owner and versions
 set(VERBOSE_NAME "Autopilot_Route")
@@ -58,7 +60,7 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "33")
+set(VERSION_PATCH "35")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE  "20/01/2025")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
