@@ -31,7 +31,7 @@
 
 #include <wx/fileconf.h>
 
-#include "version.h"
+#include "config.h"
 #include "wxWTranslateCatalog.h"
 
 #define ABOUT_AUTHOR_URL "http://seandepagnier.users.sourceforge.net"
@@ -52,7 +52,7 @@
 #define _(s) wxGetTranslation((s))
 #endif // WXINTL_NO_GETTEXT_MACRO
 
-
+#include <stdint.h>
 #include "ocpn_plugin.h"
 
 #ifdef __MSVC__

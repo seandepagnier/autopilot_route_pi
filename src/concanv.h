@@ -29,6 +29,8 @@
 #ifndef __concanv_H__
 #define __concanv_H__
 
+#include <stdint.h>
+
 #include "ocpn_plugin.h"
 #include "autopilot_route_pi.h"
 

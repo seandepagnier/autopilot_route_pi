@@ -1,24 +1,27 @@
-Autopilot Route Plugin for OpenCPN
-=======================================
-Implement Configurable Autopilot Route following abilities for opencpn
+# Demo plugin README
 
-Compiling
-=========
+An OpenCPN Demonstration plugin that illustrates the use of the OpenCPN Plugin API's
+The plugin does nothing useful other than guiding a plugin developer through each of the different types of API's
 
-* git clone git://github.com/seandepagnier/autopilot_route_pi.git
 
-Do NOT attempt to build this plugin from within the OpenCPN source tree.
+Building is documented in INSTALL.md
 
-Under windows, you must find the file "opencpn.lib" (Visual Studio) or "libopencpn.dll.a" (mingw) which is built in the build directory after compiling opencpn.  This file must be copied to the plugin directory.
+The plugin uses a continous integration setup described in the
+[wiki](https://github.com/Rasbats/managed_plugins/wiki/Alternative-Workflow)
+This setup is also able to push all updated metadata files to a clone
+of https://github.com/OpenCPN/plugins in order to simplify pull requests
+against this site.
 
-Build as normally:
 
-* cd ..
-* cd build
-* cmake ..
-* make
-* make install
+## Copyright and licensing
 
-License
-=======
-The plugin code is licensed under the terms of the GPL v3 or, at your will, later.
+This software is Copyright (c) Steven Adler 2025. It is distributed
+under the terms of the Gnu Public License version 3 or, at your option,
+any later version. See the file COPYING for details.
+
+Icons made by Freepik(http://www.freepik.com) from
+Flaticon(https://www.flaticon.com/) and is licensed using Creative Commons
+BY 3.0 (http://creativecommons.org/licenses/by/3.0/)
+
+The documentation (or lack thereof) in the directory manual is distributed using a
+CC BY-SA 4.0 license.

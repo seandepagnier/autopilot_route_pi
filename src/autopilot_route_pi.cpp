@@ -120,7 +120,7 @@ autopilot_route_pi::autopilot_route_pi(void *ppimgr)
 
 int autopilot_route_pi::Init(void)
 {
-    AddLocaleCatalog( PLUGIN_CATALOG_NAME );
+    AddLocaleCatalog( wxS("opencpn-${PKG_NAME}") );
 
     // Read Config
     wxFileConfig *pConf = GetOCPNConfigObject();
@@ -243,12 +243,14 @@ bool autopilot_route_pi::DeInit(void)
 
 int autopilot_route_pi::GetAPIVersionMajor()
 {
-    return OCPN_API_VERSION_MAJOR;
+    return atoi(API_VERSION);
 }
 
 int autopilot_route_pi::GetAPIVersionMinor()
 {
-    return OCPN_API_VERSION_MINOR;
+    std::string v(API_VERSION);
+    size_t dotpos = v.find('.');
+    return atoi(v.substr(dotpos + 1).c_str());
 }
 
 int autopilot_route_pi::GetPlugInVersionMajor()
@@ -271,35 +273,28 @@ int autopilot_route_pi::GetPlugInVersionPost()
     return PLUGIN_VERSION_TWEAK;
 }
 
-
-
 //  Converts  icon.cpp file to an image. Original process
 //wxBitmap *autopilot_route_pi::GetPlugInBitmap()
 //{
 //    return new wxBitmap(_img_autopilot_route->ConvertToImage().Copy());
 //}
 
-// Shipdriver uses the climatology_panel.png file to make the bitmap.
 wxBitmap *autopilot_route_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
-// End of shipdriver process
 
 
 wxString autopilot_route_pi::GetCommonName()
 {
-    return _T(PLUGIN_COMMON_NAME);
-//    return _("Autopilot Route");
+    return _T(PLUGIN_API_NAME);
 }
 
 wxString autopilot_route_pi::GetShortDescription()
 {
-    return _(PLUGIN_SHORT_DESCRIPTION);
-//    return _("Autopilot Route PlugIn for OpenCPN");
+    return _(PLUGIN_API_NAME);
 }
 
 wxString autopilot_route_pi::GetLongDescription()
 {
-    return _(PLUGIN_LONG_DESCRIPTION); 
-//    return _("Autopilot Route PlugIn for OpenCPN Configurable Autopilot Route following abilities.");
+    return _(PKG_DESCRIPTION);
 }
 
 void autopilot_route_pi::SetColorScheme(PI_ColorScheme cs)
