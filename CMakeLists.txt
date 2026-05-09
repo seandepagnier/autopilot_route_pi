@@ -18,7 +18,7 @@
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,                                       *
 ## *   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx                                       *
 #-----------------------------------------------------------------------------
-# Frontend2 Author: Jon Gough Testplugin(TP) v1.0.326.0 18/01/2025 DD/MM/YYYY
+# Frontend2 Author: Jon Gough Testplugin(TP) v1.0.358.1 21/01/2026 DD/MM/YYYY
 # buildCI:yes useODAPI:no validateJSON:no
 # ---------------------------------------------------------------------------
 ## -- When changing this file do NOT change the order of the sections.    -- ##
@@ -45,7 +45,9 @@ if(COMMAND cmake_policy)
 endif (COMMAND cmake_policy)
 
 # set for vscode/vscodium
-set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+# set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # define plugin name, owner and versions
 set(VERBOSE_NAME "Autopilot_Route")
@@ -58,9 +60,9 @@ set(LONG_DESCRIPTION "Configurable Autopilot Route following abilities.")
 
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "4")
-set(VERSION_PATCH "33")
+set(VERSION_PATCH "42")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "20/01/2025")#DD/MM/YYYY format
+set(VERSION_DATE  "25/01/2026")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
